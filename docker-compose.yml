@@ -18,7 +18,7 @@ services:
     volumes:
       - stool_data:/data
     ports:
-      - "${BACKEND_PORT:-4000}:4000"
+      - "${BACKEND_PORT:-4000}:${BACKEND_PORT:-4000}"
     networks:
       - stool_net
 
