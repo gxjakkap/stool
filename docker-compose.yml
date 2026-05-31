@@ -1,0 +1,42 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      - BACKEND_PORT=4000
+      - FRONTEND_ORIGIN=http://localhost:${FRONTEND_PORT:-3000}
+      - DB_PATH=/data/stool.db
+      - OIDC_ISSUER=${OIDC_ISSUER}
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI}
+      - APP_SECRET=${APP_SECRET}
+      - TWITCH_CHANNEL=${TWITCH_CHANNEL:-}
+      - YOUTUBE_CHANNEL_ID=${YOUTUBE_CHANNEL_ID:-}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}
+      - TIKTOK_USERNAME=${TIKTOK_USERNAME:-}
+    volumes:
+      - stool_data:/data
+    networks:
+      - stool_net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
+    networks:
+      - stool_net
+
+volumes:
+  stool_data:
+
+networks:
+  stool_net:
+    driver: bridge

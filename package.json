@@ -1,0 +1,19 @@
+{
+  "name": "stool",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "bun@1.3.9",
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "start": "turbo run start"
+  },
+  "devDependencies": {
+    "turbo": "^2.9.16"
+  }
+}

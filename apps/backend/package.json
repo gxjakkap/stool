@@ -1,0 +1,27 @@
+{
+  "name": "@stool/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --env-file=../../.env --hot src/index.ts",
+    "start": "bun run --env-file=../../.env src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun"
+  },
+  "dependencies": {
+    "elysia": "latest",
+    "@elysiajs/cors": "latest",
+    "@elysiajs/cookie": "latest",
+    "@elysiajs/static": "latest",
+    "openid-client": "latest",
+    "tmi.js": "latest",
+    "googleapis": "latest",
+    "tiktok-live-connector": "latest",
+    "nanoid": "latest"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "@types/tmi.js": "latest",
+    "typescript": "latest"
+  }
+}
