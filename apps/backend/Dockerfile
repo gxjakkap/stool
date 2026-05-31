@@ -1,11 +1,7 @@
 FROM oven/bun:1-alpine AS pruner
 WORKDIR /app
 
-COPY package.json bun.lock turbo.json ./
-RUN bun install --frozen-lockfile
-
-COPY apps ./apps
-
+COPY . .
 RUN bunx turbo prune @stool/backend --docker
 
 FROM oven/bun:1-alpine AS installer
@@ -18,7 +14,7 @@ RUN bun install --frozen-lockfile
 FROM oven/bun:1-alpine AS runner
 WORKDIR /app
 
-COPY --from=installer /app/node_modules ./node_modules
+COPY --from=installer /app/ .
 COPY --from=pruner /app/out/full/ .
 
 WORKDIR /app/apps/backend
