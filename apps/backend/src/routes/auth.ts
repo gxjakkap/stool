@@ -83,12 +83,13 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
       cookie.session.set({
         value: sessionId,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
+        secure: true,
         maxAge: 86400 * 7,
         path: "/",
       });
 
-      return redirect("/");
+      return redirect(process.env.FRONTEND_ORIGIN ?? "/");
     } catch (e: any) {
       return new Response(`Auth Error: ${e.message}`, { status: 500 });
     }

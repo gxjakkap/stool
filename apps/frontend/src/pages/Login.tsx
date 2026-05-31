@@ -3,7 +3,8 @@ import { Loader2 } from 'lucide-react'
 
 export default function Login() {
   useEffect(() => {
-    window.location.href = '/auth/login'
+    const origin = window.ENV?.VITE_API_ORIGIN || import.meta.env.VITE_API_ORIGIN || window.location.origin
+    window.location.href = `${origin}/auth/login`
   }, [])
 
   return (
