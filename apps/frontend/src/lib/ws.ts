@@ -26,9 +26,10 @@ export function useChat(token?: string) {
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const mountedRef = useRef(true)
+  const unauthorizedRef = useRef(false)
 
   const connect = useCallback(() => {
-    if (!mountedRef.current) return
+    if (!mountedRef.current || unauthorizedRef.current) return
     const url = token ? `${getWsUrl()}?token=${token}` : getWsUrl()
     const ws = new WebSocket(url)
     wsRef.current = ws
@@ -42,7 +43,14 @@ export function useChat(token?: string) {
     ws.onmessage = (event) => {
       if (!mountedRef.current) return
       try {
-        const msg: ChatMessage = JSON.parse(event.data as string)
+        const msg = JSON.parse(event.data as string)
+        if (msg.error === 'Unauthorized') {
+          console.error('[WS] Unauthorized. Stopping reconnects.')
+          unauthorizedRef.current = true
+          if (reconnectRef.current) clearTimeout(reconnectRef.current)
+          ws.close()
+          return
+        }
         if (msg.id) {
           setMessages((prev) => {
             if (prev.some((m) => m.id === msg.id)) return prev
@@ -54,9 +62,10 @@ export function useChat(token?: string) {
       }
     }
 
-    ws.onclose = () => {
+    ws.onclose = (e) => {
       if (!mountedRef.current) return
       setConnected(false)
+      if (unauthorizedRef.current) return
       console.log('[WS] Disconnected, reconnecting in 3s...')
       reconnectRef.current = setTimeout(connect, 3000)
     }
