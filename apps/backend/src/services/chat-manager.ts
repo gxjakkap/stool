@@ -64,11 +64,18 @@ class ChatManager {
     const youtubeApiKey = getSetting("youtube_api_key") ?? "";
     const tiktokUsername = getSetting("tiktok_username") ?? "";
 
-    await Promise.allSettled([
+    const results = await Promise.allSettled([
       this.startTwitch(twitchChannel),
       this.startYouTube(youtubeChannelId, youtubeApiKey),
       this.startTikTok(tiktokUsername),
     ]);
+
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        const platforms = ["Twitch", "YouTube", "TikTok"];
+        console.error(`[ChatManager] Failed to start ${platforms[index]} connector:`, result.reason);
+      }
+    });
   }
 }
 
