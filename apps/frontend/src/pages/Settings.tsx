@@ -232,20 +232,35 @@ export default function Settings() {
                 <TikTokIcon className="h-4 w-4 text-[#00f2ea]" />
                 <h2 className="text-sm font-semibold">TikTok</h2>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="tiktok-username">Username</Label>
-                <Input
-                  id="tiktok-username"
-                  placeholder="@yourusername"
-                  value={s('tiktok_username')}
-                  onChange={(e) => set('tiktok_username', e.target.value)}
-                />
-                <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                  @ prefix is optional. Leave empty to disable.
-                </p>
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label htmlFor="tiktok-username">Username</Label>
+                  <Input
+                    id="tiktok-username"
+                    placeholder="@yourusername"
+                    value={s('tiktok_username')}
+                    onChange={(e) => set('tiktok_username', e.target.value)}
+                  />
+                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                    @ prefix is optional. Leave empty to disable.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="tiktok-session-id">Session ID</Label>
+                  <Input
+                    id="tiktok-session-id"
+                    type="password"
+                    placeholder="sessionid from tiktok.com cookies"
+                    value={s('tiktok_session_id')}
+                    onChange={(e) => set('tiktok_session_id', e.target.value)}
+                  />
+                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                    Required to bypass anti-bot websocket blocks. Find this in your browser cookies (named <code>sessionid</code>).
+                  </p>
+                </div>
               </div>
               <Button
-                onClick={() => handleSave(['tiktok_username'])}
+                onClick={() => handleSave(['tiktok_username', 'tiktok_session_id'])}
                 disabled={saving}
                 size="sm"
               >

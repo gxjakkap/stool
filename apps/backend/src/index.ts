@@ -29,4 +29,9 @@ console.log(`[stool backend] Listening on http://localhost:${PORT}`);
 // Start chat connectors from saved settings
 chatManager.restartFromSettings().catch(console.error);
 
+// Catch unhandled exceptions (like third-party websocket errors) so the server doesn't crash
+process.on("uncaughtException", (error) => {
+  console.error("[Backend] Uncaught Exception:", error);
+});
+
 export type App = typeof app;

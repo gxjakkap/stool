@@ -9,6 +9,7 @@ export class TikTokConnector {
 
   constructor(
     private username: string,
+    private sessionId: string | undefined,
     private onMessage: (msg: ChatMessage) => void
   ) {}
 
@@ -24,16 +25,24 @@ export class TikTokConnector {
       const normalizedUsername = this.username.startsWith("@")
         ? this.username.slice(1)
         : this.username;
-      this.connection = new TikTokLiveConnection(normalizedUsername, {});
+      this.connection = new TikTokLiveConnection(normalizedUsername, { 
+        processInitialData: false,
+        ...(this.sessionId ? { sessionId: this.sessionId } : {})
+      });
 
       this.connection.on("chat", (data: any) => {
-        console.log(`[TikTok] New chat from ${data.uniqueId}: ${data.comment}`);
+        const uniqueId = data.user?.displayId ?? "unknown";
+        const nickname = data.user?.nickname ?? uniqueId;
+        const msgText = data.content ?? "";
+        
+        console.log(`[TikTok] New chat from ${uniqueId}: ${msgText}`);
+        
         this.onMessage({
-          id: data.msgId?.toString() ?? nanoid(),
+          id: data.common?.msgId?.toString() ?? nanoid(),
           platform: "tiktok",
-          username: data.uniqueId ?? "unknown",
-          displayName: data.nickname ?? data.uniqueId ?? "Unknown",
-          message: data.comment ?? "",
+          username: uniqueId,
+          displayName: nickname,
+          message: msgText,
           timestamp: Date.now(),
         });
       });

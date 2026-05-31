@@ -39,11 +39,11 @@ class ChatManager {
     await this.youtubeConnector.start();
   }
 
-  async startTikTok(username: string): Promise<void> {
+  async startTikTok(username: string, sessionId?: string): Promise<void> {
     if (!username) return;
     const { TikTokConnector } = await import("../connectors/tiktok");
     this.tiktokConnector?.stop();
-    this.tiktokConnector = new TikTokConnector(username, (msg) => this.broadcast(msg));
+    this.tiktokConnector = new TikTokConnector(username, sessionId, (msg) => this.broadcast(msg));
     await this.tiktokConnector.start();
   }
 
@@ -63,11 +63,12 @@ class ChatManager {
     const youtubeChannelId = getSetting("youtube_channel_id") ?? "";
     const youtubeApiKey = getSetting("youtube_api_key") ?? "";
     const tiktokUsername = getSetting("tiktok_username") ?? "";
+    const tiktokSessionId = getSetting("tiktok_session_id") ?? undefined;
 
     const results = await Promise.allSettled([
       this.startTwitch(twitchChannel),
       this.startYouTube(youtubeChannelId, youtubeApiKey),
-      this.startTikTok(tiktokUsername),
+      this.startTikTok(tiktokUsername, tiktokSessionId),
     ]);
 
     results.forEach((result, index) => {
