@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     environment:
       - BACKEND_PORT=${BACKEND_PORT:-4000}
-      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN:-http://localhost}:${FRONTEND_PORT:-3000}
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN:-http://localhost:3000}
       - DB_PATH=/data/stool.db
       - OIDC_ISSUER=${OIDC_ISSUER}
       - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
@@ -17,6 +17,8 @@ services:
       - TIKTOK_USERNAME=${TIKTOK_USERNAME:-}
     volumes:
       - stool_data:/data
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
     networks:
       - stool_net
 
