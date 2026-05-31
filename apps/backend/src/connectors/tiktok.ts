@@ -1,9 +1,9 @@
-import { WebcastPushConnection } from "tiktok-live-connector";
+import { TikTokLiveConnection } from "tiktok-live-connector";
 import { nanoid } from "nanoid";
 import type { ChatMessage } from "../types";
 
 export class TikTokConnector {
-  private connection: WebcastPushConnection | null = null;
+  private connection: TikTokLiveConnection | null = null;
   private retryTimeout: ReturnType<typeof setTimeout> | null = null;
   private isStopped = false;
 
@@ -24,7 +24,7 @@ export class TikTokConnector {
       const normalizedUsername = this.username.startsWith("@")
         ? this.username.slice(1)
         : this.username;
-      this.connection = new WebcastPushConnection(normalizedUsername);
+      this.connection = new TikTokLiveConnection(normalizedUsername);
 
       this.connection.on("chat", (data: any) => {
         console.log(`[TikTok] New chat from ${data.uniqueId}: ${data.comment}`);
