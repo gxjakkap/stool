@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ghcr.io/${GITHUB_REPOSITORY:-gxjakkap/stool}-be:main
+    image: ghcr.io/${GITHUB_REPOSITORY:-gxjakkap/stool}-be:latest
     restart: unless-stopped
     environment:
       - BACKEND_PORT=${BACKEND_PORT:-4000}
@@ -21,7 +21,7 @@ services:
       - stool_net
 
   frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY:-gxjakkap/stool}-fe:main
+    image: ghcr.io/${GITHUB_REPOSITORY:-gxjakkap/stool}-fe:latest
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
