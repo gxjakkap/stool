@@ -1,8 +1,6 @@
 services:
   backend:
-    build:
-      context: .
-      dockerfile: apps/backend/Dockerfile
+    image: ghcr.io/${GITHUB_REPOSITORY:-gxjakkap/stool}-be:main
     restart: unless-stopped
     environment:
       - BACKEND_PORT=4000
@@ -23,9 +21,7 @@ services:
       - stool_net
 
   frontend:
-    build:
-      context: .
-      dockerfile: apps/frontend/Dockerfile
+    image: ghcr.io/${GITHUB_REPOSITORY:-gxjakkap/stool}-fe:main
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-3000}:80"
