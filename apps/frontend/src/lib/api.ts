@@ -1,4 +1,12 @@
-const BASE = '' // proxied via Vite dev server
+/// <reference types="vite/client" />
+
+declare global {
+  interface Window {
+    ENV?: { VITE_API_ORIGIN?: string }
+  }
+}
+
+const BASE = window.ENV?.VITE_API_ORIGIN || import.meta.env.VITE_API_ORIGIN || '' // fallback to Vite env or relative
 
 export async function getSettings(): Promise<Record<string, string>> {
   const res = await fetch(`${BASE}/api/settings`, { credentials: 'include' })

@@ -3,8 +3,8 @@ services:
     image: ghcr.io/${GITHUB_REPOSITORY:-gxjakkap/stool}-be:main
     restart: unless-stopped
     environment:
-      - BACKEND_PORT=4000
-      - FRONTEND_ORIGIN=http://localhost:${FRONTEND_PORT:-3000}
+      - BACKEND_PORT=${BACKEND_PORT:-4000}
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN:-http://localhost}:${FRONTEND_PORT:-3000}
       - DB_PATH=/data/stool.db
       - OIDC_ISSUER=${OIDC_ISSUER}
       - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
@@ -22,7 +22,12 @@ services:
 
   frontend:
     image: ghcr.io/${GITHUB_REPOSITORY:-gxjakkap/stool}-fe:main
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
     restart: unless-stopped
+    environment:
+      - VITE_API_ORIGIN=${VITE_API_ORIGIN:-}
     ports:
       - "${FRONTEND_PORT:-3000}:80"
     depends_on:

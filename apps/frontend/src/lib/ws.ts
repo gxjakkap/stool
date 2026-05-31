@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import { useEffect, useRef, useState, useCallback } from 'react'
 
 export interface ChatMessage {
@@ -12,8 +14,10 @@ export interface ChatMessage {
 }
 
 function getWsUrl() {
-  const proto = window.location.protocol === 'https:' ? 'wss' : 'ws'
-  return `${proto}://${window.location.host}/ws`
+  const origin = window.ENV?.VITE_API_ORIGIN || import.meta.env.VITE_API_ORIGIN || window.location.origin
+  const url = new URL(origin)
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+  return `${url.origin}/ws`
 }
 
 export function useChat(token?: string) {
