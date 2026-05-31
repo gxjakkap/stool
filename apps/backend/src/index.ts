@@ -22,7 +22,7 @@ const app = new Elysia()
   .use(tokenRoutes)
   .use(wsRoutes)
   .get("/health", () => ({ ok: true, timestamp: Date.now() }))
-  .listen(PORT);
+  .listen({ port: PORT, hostname: "0.0.0.0" });
 
 console.log(`[stool backend] Listening on http://localhost:${PORT}`);
 
