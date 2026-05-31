@@ -24,7 +24,7 @@ export class TikTokConnector {
       const normalizedUsername = this.username.startsWith("@")
         ? this.username.slice(1)
         : this.username;
-      this.connection = new TikTokLiveConnection(normalizedUsername);
+      this.connection = new TikTokLiveConnection(normalizedUsername, {});
 
       this.connection.on("chat", (data: any) => {
         console.log(`[TikTok] New chat from ${data.uniqueId}: ${data.comment}`);
