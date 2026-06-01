@@ -9,11 +9,17 @@ interface ChatMessageProps {
   compact?: boolean
 }
 
+import { useEmoteParser } from '@/lib/emotes'
+
 export function ChatMessage({ message, className, compact = false }: ChatMessageProps) {
+  const { parse } = useEmoteParser()
   const timeStr = new Date(message.timestamp).toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
   })
+
+  // Parse emotes into an HTML string
+  const parsedMessage = parse(message.message)
 
   return (
     <div
@@ -40,7 +46,10 @@ export function ChatMessage({ message, className, compact = false }: ChatMessage
           </span>
         )}
       </div>
-      <p className="text-sm leading-relaxed text-[hsl(var(--foreground)/0.9)]">{message.message}</p>
+      <p 
+        className="text-sm leading-relaxed text-[hsl(var(--foreground)/0.9)] [&>img]:inline-block [&>img]:align-middle [&>img]:h-6"
+        dangerouslySetInnerHTML={{ __html: parsedMessage }}
+      />
     </div>
   )
 }

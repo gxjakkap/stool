@@ -1,6 +1,7 @@
-import type { ChatMessage } from "../types";
+import type { ChatMessage, WsMessage } from "../types";
 
-type MessageHandler = (msg: ChatMessage) => void;
+type MessageHandler = (msg: WsMessage) => void;
+
 
 class ChatManager {
   private handlers: Set<MessageHandler> = new Set();
@@ -13,7 +14,7 @@ class ChatManager {
     return () => this.handlers.delete(handler);
   }
 
-  broadcast(msg: ChatMessage): void {
+  broadcast(msg: WsMessage): void {
     for (const handler of this.handlers) {
       try {
         handler(msg);

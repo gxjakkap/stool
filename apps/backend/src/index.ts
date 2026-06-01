@@ -6,6 +6,7 @@ import { tokenRoutes } from "./routes/token";
 import { authRoutes } from "./routes/auth";
 import { wsRoutes } from "./routes/ws";
 import { chatManager } from "./services/chat-manager";
+import { emoteCache } from "./services/emote-cache";
 
 // Run migrations
 migrate();
@@ -26,8 +27,9 @@ const app = new Elysia()
 
 console.log(`[stool backend] Listening on http://localhost:${PORT}`);
 
-// Start chat connectors from saved settings
+// Start chat connectors and emote cache from saved settings
 chatManager.restartFromSettings().catch(console.error);
+emoteCache.init().catch(console.error);
 
 // Catch unhandled exceptions (like third-party websocket errors) so the server doesn't crash
 process.on("uncaughtException", (error) => {

@@ -164,16 +164,39 @@ export default function Settings() {
                 <Label htmlFor="twitch-channel">Channel name</Label>
                 <Input
                   id="twitch-channel"
-                  placeholder="yourchannelname"
+                  placeholder="Your Twitch channel"
                   value={s('twitch_channel')}
                   onChange={(e) => set('twitch_channel', e.target.value)}
                 />
-                <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                  No # prefix needed. Leave empty to disable.
-                </p>
               </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="twitch-client-id">Client ID</Label>
+                <Input
+                  id="twitch-client-id"
+                  value={s('twitch_client_id')}
+                  onChange={(e) => set('twitch_client_id', e.target.value)}
+                  placeholder="Twitch API Client ID"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="twitch-client-secret">Client Secret</Label>
+                <Input
+                  id="twitch-client-secret"
+                  type="password"
+                  value={s('twitch_client_secret')}
+                  onChange={(e) => set('twitch_client_secret', e.target.value)}
+                  placeholder="Twitch API Client Secret"
+                />
+              </div>
+              
+              <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                No # prefix needed. Leave empty to disable.
+              </p>
+              
               <Button
-                onClick={() => handleSave(['twitch_channel'])}
+                onClick={() => handleSave(['twitch_channel', 'twitch_client_id', 'twitch_client_secret'])}
                 disabled={saving}
                 size="sm"
               >

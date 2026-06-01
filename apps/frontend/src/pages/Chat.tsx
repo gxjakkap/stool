@@ -15,7 +15,7 @@ export default function Chat() {
           <MessageSquare className="h-5 w-5 text-[hsl(var(--primary))]" />
           <h1 className="text-sm font-semibold">Chat</h1>
           <span className="text-xs text-[hsl(var(--muted-foreground))]">
-            {messages.length} {messages.length === 1 ? 'message' : 'messages'}
+            {messages.length} {messages.length === 1 ? 'item' : 'items'}
           </span>
         </div>
         <div className="flex items-center gap-2">

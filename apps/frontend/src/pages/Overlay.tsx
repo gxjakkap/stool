@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useChat, type ChatMessage } from '@/lib/ws'
+import { useChat, type WsMessage } from '@/lib/ws'
 import { PlatformBadge } from '@/components/PlatformBadge'
 import { ChatBadges } from '@/components/ChatBadges'
+import { TikTokEventBubble } from '@/components/TikTokEventBubble'
 import { cn } from '@/lib/utils'
 
-interface OverlayMessage extends ChatMessage {
+type OverlayMessage = WsMessage & {
   expireAt: number
   exiting: boolean
 }
@@ -14,6 +15,8 @@ const DEFAULT_EXPIRE = 30
 const DEFAULT_MAX = 20
 const DEFAULT_FONT_SIZE = 16
 
+import { useEmoteParser } from '@/lib/emotes'
+
 export default function Overlay() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? undefined
@@ -21,11 +24,13 @@ export default function Overlay() {
   const maxMessages = Number(searchParams.get('max') ?? DEFAULT_MAX)
   const fontSize = Number(searchParams.get('fontSize') ?? DEFAULT_FONT_SIZE)
   const animSpeed = searchParams.get('anim') ?? 'normal'
-  const theme = searchParams.get('theme') ?? 'dark'
+  const theme = (searchParams.get('theme') ?? 'dark') as 'dark' | 'light'
 
+  const { parse } = useEmoteParser()
   const { messages } = useChat(token)
   const [overlayMessages, setOverlayMessages] = useState<OverlayMessage[]>([])
   const processedIds = useRef(new Set<string>())
+
 
   // Set transparent background for OBS
   useEffect(() => {
@@ -81,43 +86,58 @@ export default function Overlay() {
       className="fixed bottom-0 left-0 right-0 flex flex-col-reverse gap-1.5 p-3"
       style={{ fontSize: `${fontSize}px`, background: 'transparent' }}
     >
-      {[...overlayMessages].reverse().map((msg) => (
-        <div
-          key={msg.id}
-          className={cn(
-            'flex flex-col gap-0.5 rounded-lg px-3 py-2 shadow-lg backdrop-blur-sm',
-            theme === 'light'
-              ? 'bg-white/90 text-black'
-              : 'bg-black/80 text-white',
-            msg.exiting ? 'msg-expire' : 'msg-enter'
-          )}
-          style={{ animationDuration: animDuration }}
-        >
-          <div className="flex items-center gap-2">
-            <PlatformBadge platform={msg.platform} size="sm" />
-            <div className="flex items-center gap-1.5">
-              <ChatBadges badges={msg.badges} size="sm" />
-              <span
-                className={cn(
-                  'text-sm font-semibold leading-none',
-                  theme === 'light' && !msg.userColor && 'text-zinc-800'
-                )}
-                style={msg.userColor ? { color: msg.userColor } : undefined}
-              >
-                {msg.displayName}
-              </span>
+      {[...overlayMessages].reverse().map((msg) => {
+        // TikTok social events (gift / follow / share)
+        if (msg.type === 'tiktok_event') {
+          return (
+            <div
+              key={msg.id}
+              className={cn(msg.exiting ? 'msg-expire' : 'msg-enter')}
+              style={{ animationDuration: animDuration }}
+            >
+              <TikTokEventBubble event={msg} compact theme={theme} />
             </div>
-          </div>
-          <p
+          )
+        }
+
+        // Regular chat message
+        return (
+          <div
+            key={msg.id}
             className={cn(
-              'text-sm leading-snug',
-              theme === 'light' ? 'text-black/90' : 'text-white/90'
+              'flex flex-col gap-0.5 rounded-lg px-3 py-2 shadow-lg backdrop-blur-sm',
+              theme === 'light'
+                ? 'bg-white/90 text-black'
+                : 'bg-black/80 text-white',
+              msg.exiting ? 'msg-expire' : 'msg-enter'
             )}
+            style={{ animationDuration: animDuration }}
           >
-            {msg.message}
-          </p>
-        </div>
-      ))}
+            <div className="flex items-center gap-2">
+              <PlatformBadge platform={msg.platform} size="sm" />
+              <div className="flex items-center gap-1.5">
+                <ChatBadges badges={msg.badges} size="sm" />
+                <span
+                  className={cn(
+                    'text-sm font-semibold leading-none',
+                    theme === 'light' && !msg.userColor && 'text-zinc-800'
+                  )}
+                  style={msg.userColor ? { color: msg.userColor } : undefined}
+                >
+                  {msg.displayName}
+                </span>
+              </div>
+            </div>
+            <p
+              className={cn(
+                'text-sm leading-snug [&>img]:inline-block [&>img]:align-middle [&>img]:h-6',
+                theme === 'light' ? 'text-black/90' : 'text-white/90'
+              )}
+              dangerouslySetInnerHTML={{ __html: parse(msg.message) }}
+            />
+          </div>
+        )
+      })}
     </div>
   )
 }

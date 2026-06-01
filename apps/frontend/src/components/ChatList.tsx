@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { ChatMessage } from './ChatMessage'
-import type { ChatMessage as ChatMessageType } from '@/lib/ws'
+import { TikTokEventBubble } from './TikTokEventBubble'
+import type { WsMessage } from '@/lib/ws'
 import { cn } from '@/lib/utils'
 
 interface ChatListProps {
-  messages: ChatMessageType[]
+  messages: WsMessage[]
   className?: string
   autoScroll?: boolean
 }
@@ -20,9 +21,13 @@ export function ChatList({ messages, className, autoScroll = true }: ChatListPro
 
   return (
     <div className={cn('flex flex-col gap-1 overflow-y-auto', className)}>
-      {messages.map((msg) => (
-        <ChatMessage key={msg.id} message={msg} />
-      ))}
+      {messages.map((msg) =>
+        msg.type === 'tiktok_event' ? (
+          <TikTokEventBubble key={msg.id} event={msg} />
+        ) : (
+          <ChatMessage key={msg.id} message={msg} />
+        )
+      )}
       <div ref={bottomRef} />
     </div>
   )

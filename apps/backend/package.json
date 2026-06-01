@@ -12,6 +12,7 @@
     "@elysiajs/cookie": "latest",
     "@elysiajs/cors": "latest",
     "@elysiajs/static": "latest",
+    "@mkody/twitch-emoticons": "^2.9.7",
     "elysia": "latest",
     "googleapis": "latest",
     "nanoid": "latest",
