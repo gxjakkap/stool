@@ -1,11 +1,7 @@
-import Elysia from "elysia";
-import { SESSIONS } from "../routes/auth";
+import { Elysia } from "elysia";
+import { SESSIONS } from "./service";
 
-/**
- * Elysia plugin that guards routes with session-cookie authentication.
- * Returns 401 JSON if the session cookie is missing or invalid.
- */
-export const requireAuth = new Elysia({ name: "require-auth" })
+export const authGuard = new Elysia({ name: "auth.guard" })
   .derive({ as: "scoped" }, ({ cookie }) => {
     const sessionId = cookie.session.value as string | undefined;
     if (!sessionId || !SESSIONS.has(sessionId)) {
@@ -21,4 +17,3 @@ export const requireAuth = new Elysia({ name: "require-auth" })
       return { error: "Unauthorized" };
     }
   });
-

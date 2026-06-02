@@ -20,3 +20,12 @@ export function getAllSettings(): Record<string, string> {
     .all();
   return Object.fromEntries(rows.map((r: { key: string; value: string }) => [r.key, r.value]));
 }
+
+
+export function addDonation(referenceNo: string, channelName: string, donateMessage: string | null, donatorName: string, amount: number, time: Date){
+  db.query(
+    `INSERT INTO donation (ref_no, channel_name, donator_name, donate_message, amount, time, read)
+    VALUES (?, ?, ?, ?, ?, ?)
+    `
+  ).run(referenceNo, channelName, donatorName, donateMessage, amount, Math.floor(time.valueOf() / 1000), false)
+}

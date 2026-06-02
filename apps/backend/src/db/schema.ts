@@ -20,6 +20,17 @@ export function migrate(): void {
       label TEXT NOT NULL DEFAULT '',
       created_at INTEGER DEFAULT (unixepoch())
     );
+
+    CREATE TABLE IF NOT EXISTS donation (
+      id INTEGER PRIMARY KEY,
+      ref_no TEXT NOT NULL,
+      channel_name TEXT NOT NULL,
+      donator_name TEXT NOT NULL,
+      donate_message TEXT,
+      amount NUMERIC NOT NULL,
+      time INTEGER NOT NULL,
+      read BOOLEAN DEFAULT FALSE
+    )
   `);
 
   const defaults: Record<string, string> = {

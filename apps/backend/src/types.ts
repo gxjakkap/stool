@@ -1,3 +1,12 @@
+/**
+ * Shared domain types.
+ * Derived from TypeBox models where applicable — single source of truth.
+ */
+import type { UnwrapSchema } from "elysia";
+import type { TokenModel } from "./modules/token/model";
+
+// ── Chat ──────────────────────────────────────────────────────────────────────
+
 export interface ChatMessage {
   id: string;
   type?: "chat";
@@ -30,31 +39,14 @@ export interface TikTokEventMessage {
 /** Union of all messages that can be broadcast over WebSocket */
 export type WsMessage = ChatMessage | TikTokEventMessage;
 
+// ── Emotes ────────────────────────────────────────────────────────────────────
+
 export interface EmoteInfo {
   code: string;
   url: string;
 }
 
-export interface OverlayToken {
-  token: string;
-  label: string;
-  created_at: number;
-}
+// ── Token ─────────────────────────────────────────────────────────────────────
 
-export interface Settings {
-  twitch_channel: string;
-  twitch_client_id: string;
-  twitch_client_secret: string;
-  youtube_channel_id: string;
-  youtube_api_key: string;
-  tiktok_username: string;
-  overlay_expire_seconds: string;
-  overlay_max_messages: string;
-  overlay_font_size: string;
-  overlay_animation_speed: string;
-  oidc_issuer: string;
-  oidc_client_id: string;
-  oidc_client_secret: string;
-  oidc_redirect_uri: string;
-  [key: string]: string;
-}
+/** Derived from TokenModel — single source of truth */
+export type OverlayToken = UnwrapSchema<(typeof TokenModel)["overlayToken"]>;

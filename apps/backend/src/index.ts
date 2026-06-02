@@ -1,10 +1,11 @@
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { migrate } from "./db/schema";
-import { settingsRoutes } from "./routes/settings";
-import { tokenRoutes } from "./routes/token";
-import { authRoutes } from "./routes/auth";
-import { wsRoutes } from "./routes/ws";
+import { authRoutes } from "./modules/auth/index";
+import { settingsRoutes } from "./modules/settings/index";
+import { tokenRoutes } from "./modules/token/index";
+import { wsRoutes } from "./modules/ws/index";
+import { webhookRoutes } from "./modules/webhook/index";
 import { chatManager } from "./services/chat-manager";
 import { emoteCache } from "./services/emote-cache";
 
@@ -14,14 +15,17 @@ migrate();
 const PORT = Number(process.env.BACKEND_PORT ?? 4000);
 
 const app = new Elysia()
-  .use(cors({
-    origin: process.env.FRONTEND_ORIGIN ?? "http://localhost:3000",
-    credentials: true,
-  }))
+  .use(
+    cors({
+      origin: process.env.FRONTEND_ORIGIN ?? "http://localhost:3000",
+      credentials: true,
+    })
+  )
   .use(authRoutes)
   .use(settingsRoutes)
   .use(tokenRoutes)
   .use(wsRoutes)
+  .use(webhookRoutes)
   .get("/health", () => ({ ok: true, timestamp: Date.now() }))
   .listen({ port: PORT, hostname: "0.0.0.0" });
 

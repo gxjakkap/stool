@@ -1,4 +1,4 @@
-import type { ChatMessage, WsMessage } from "../types";
+import type { WsMessage } from "../types";
 
 type MessageHandler = (msg: WsMessage) => void;
 
