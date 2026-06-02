@@ -21,13 +21,11 @@ export function ChatList({ messages, className, autoScroll = true }: ChatListPro
 
   return (
     <div className={cn('flex flex-col gap-1 overflow-y-auto', className)}>
-      {messages.map((msg) =>
-        msg.type === 'tiktok_event' ? (
-          <TikTokEventBubble key={msg.id} event={msg} />
-        ) : msg.type === 'donation' ? null : (
-          <ChatMessage key={msg.id} message={msg} />
-        )
-      )}
+      {messages.map((msg) => {
+        if (msg.type === 'system_status' || msg.type === 'donation') return null;
+        if (msg.type === 'tiktok_event') return <TikTokEventBubble key={msg.id} event={msg} />;
+        return <ChatMessage key={msg.id} message={msg} />;
+      })}
       <div ref={bottomRef} />
     </div>
   )

@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useChat, type WsMessage } from '@/lib/ws'
+import { useChat, type ChatMessage, type TikTokEventMessage } from '@/lib/ws'
 import { PlatformBadge } from '@/components/PlatformBadge'
 import { ChatBadges } from '@/components/ChatBadges'
 import { TikTokEventBubble } from '@/components/TikTokEventBubble'
 import { cn } from '@/lib/utils'
 
-type OverlayMessage = WsMessage & {
+type OverlayMessage = (ChatMessage | TikTokEventMessage) & {
   expireAt: number
   exiting: boolean
 }
@@ -40,7 +40,9 @@ export default function Overlay() {
 
   // Add new messages
   useEffect(() => {
-    const newMsgs = messages.filter((m) => m.type !== 'donation' && !processedIds.current.has(m.id))
+    const validMsgs = messages.filter((m): m is ChatMessage | TikTokEventMessage => m.type !== 'donation' && m.type !== 'system_status')
+    const newMsgs = validMsgs.filter((m) => !processedIds.current.has(m.id))
+    
     if (newMsgs.length === 0) return
 
     for (const m of newMsgs) processedIds.current.add(m.id)
@@ -101,8 +103,7 @@ export default function Overlay() {
         }
 
         // Regular chat message
-        if (msg.type !== 'donation') {
-          return (
+        return (
             <div
               key={msg.id}
               className={cn(
@@ -138,8 +139,6 @@ export default function Overlay() {
               />
             </div>
           )
-        }
-        return null;
       })}
     </div>
   )
