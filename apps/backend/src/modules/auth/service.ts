@@ -9,11 +9,10 @@ export const SESSIONS = new Map<string, SessionData>();
 const stateStore = new Map<string, { codeVerifier: string; state: string }>();
 
 async function getOidcConfig() {
-  const issuer = getSetting("oidc_issuer") ?? "";
-  const clientId = getSetting("oidc_client_id") ?? "";
-  const clientSecret = getSetting("oidc_client_secret") ?? "";
-  const redirectUri =
-    getSetting("oidc_redirect_uri") ?? "http://localhost:4000/auth/callback";
+  const issuer = process.env.OIDC_ISSUER || getSetting("oidc_issuer") || "";
+  const clientId = process.env.OIDC_CLIENT_ID || getSetting("oidc_client_id") || "";
+  const clientSecret = process.env.OIDC_CLIENT_SECRET || getSetting("oidc_client_secret") || "";
+  const redirectUri = process.env.OIDC_REDIRECT_URI || getSetting("oidc_redirect_uri") || "http://localhost:4000/auth/callback";
 
   if (!issuer || !clientId || !clientSecret) {
     throw new Error("OIDC not configured");
