@@ -192,7 +192,7 @@ export default function DonationOverlay() {
         
         const ttsText = messageParts.join(" ")
 
-        const apiUrl = import.meta.env.VITE_API_ORIGIN || window.location.origin
+        const apiUrl = window.ENV?.VITE_API_ORIGIN || import.meta.env.VITE_API_ORIGIN || window.location.origin
         fetch(`${apiUrl}/api/tts?text=${encodeURIComponent(ttsText)}&voice=${encodeURIComponent(ttsVoice)}`)
           .then(res => res.json())
           .then(data => {
