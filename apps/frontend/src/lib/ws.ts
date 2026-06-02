@@ -31,7 +31,24 @@ export interface TikTokEventMessage {
   giftImageUrl?: string
 }
 
-export type WsMessage = ChatMessage | TikTokEventMessage
+export interface DonationMessage {
+  id: string
+  type: 'donation'
+  referenceNo: string
+  donatorName: string
+  channelName: string
+  donateMessage: string | null
+  amount: number
+  time: number
+}
+
+export interface SystemStatusMessage {
+  type: 'system_status'
+  platform: 'tiktok' | 'twitch' | 'youtube'
+  status: 'connected' | 'disconnected' | 'connecting'
+}
+
+export type WsMessage = ChatMessage | TikTokEventMessage | DonationMessage | SystemStatusMessage
 
 function getWsUrl() {
   const origin = window.ENV?.VITE_API_ORIGIN || import.meta.env.VITE_API_ORIGIN || window.location.origin
@@ -43,6 +60,7 @@ function getWsUrl() {
 export function useChat(token?: string) {
   const [messages, setMessages] = useState<WsMessage[]>([])
   const [connected, setConnected] = useState(false)
+  const [tiktokStatus, setTiktokStatus] = useState<'connected' | 'disconnected' | 'connecting'>('disconnected')
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const mountedRef = useRef(true)
@@ -64,6 +82,10 @@ export function useChat(token?: string) {
       if (!mountedRef.current) return
       try {
         const msg = JSON.parse(event.data as string)
+        if (msg.type === 'system_status' && msg.platform === 'tiktok') {
+          setTiktokStatus(msg.status)
+          return
+        }
         // Emote dictionary push from backend
         if (msg.type === 'emotes') {
           handleEmotesMessage(msg.emotes)
@@ -78,7 +100,7 @@ export function useChat(token?: string) {
         }
         if (msg.id) {
           setMessages((prev) => {
-            if (prev.some((m) => m.id === msg.id)) return prev
+            if (prev.some((m) => 'id' in m && m.id === msg.id)) return prev
             return [...prev, msg as WsMessage]
           })
         }
@@ -90,6 +112,7 @@ export function useChat(token?: string) {
     ws.onclose = () => {
       if (!mountedRef.current) return
       setConnected(false)
+      setTiktokStatus('disconnected')
       if (unauthorizedRef.current) return
       console.log('[WS] Disconnected, reconnecting in 3s...')
       reconnectRef.current = setTimeout(connect, 3000)
@@ -112,5 +135,5 @@ export function useChat(token?: string) {
 
   const clearMessages = useCallback(() => setMessages([]), [])
 
-  return { messages, connected, clearMessages }
+  return { messages, connected, tiktokStatus, clearMessages }
 }

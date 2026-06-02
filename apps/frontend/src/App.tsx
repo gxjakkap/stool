@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react'
 import { getMe } from '@/lib/api'
 
 const Overlay = lazy(() => import('./pages/Overlay'))
+const DonationOverlay = lazy(() => import('./pages/DonationOverlay'))
 const Chat = lazy(() => import('./pages/Chat'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Login = lazy(() => import('./pages/Login'))
@@ -42,6 +43,7 @@ export default function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/overlay" element={<Overlay />} />
+          <Route path="/donation-overlay" element={<DonationOverlay />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 

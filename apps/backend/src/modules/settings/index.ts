@@ -52,4 +52,8 @@ export const settingsRoutes = new Elysia({ prefix: "/api/settings" })
       params: "settings.keyParams",
       response: { 200: "settings.single" },
     }
-  );
+  )
+  .post("/tiktok/connect", async () => {
+    await chatManager.restartTikTokFromSettings();
+    return { ok: true };
+  });

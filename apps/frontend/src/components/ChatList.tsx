@@ -24,7 +24,7 @@ export function ChatList({ messages, className, autoScroll = true }: ChatListPro
       {messages.map((msg) =>
         msg.type === 'tiktok_event' ? (
           <TikTokEventBubble key={msg.id} event={msg} />
-        ) : (
+        ) : msg.type === 'donation' ? null : (
           <ChatMessage key={msg.id} message={msg} />
         )
       )}

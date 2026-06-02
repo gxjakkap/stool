@@ -6,6 +6,7 @@ import { settingsRoutes } from "./modules/settings/index";
 import { tokenRoutes } from "./modules/token/index";
 import { wsRoutes } from "./modules/ws/index";
 import { webhookRoutes } from "./modules/webhook/index";
+import { ttsRoutes } from "./modules/tts/index";
 import { chatManager } from "./services/chat-manager";
 import { emoteCache } from "./services/emote-cache";
 
@@ -26,6 +27,7 @@ const app = new Elysia()
   .use(tokenRoutes)
   .use(wsRoutes)
   .use(webhookRoutes)
+  .use(ttsRoutes)
   .get("/health", () => ({ ok: true, timestamp: Date.now() }))
   .listen({ port: PORT, hostname: "0.0.0.0" });
 

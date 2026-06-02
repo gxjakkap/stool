@@ -54,3 +54,11 @@ export async function getMe(): Promise<{ sub: string; email?: string; name?: str
   if (!res.ok) throw new Error('Not authenticated')
   return res.json()
 }
+
+export async function connectTikTok(): Promise<void> {
+  const res = await fetch(`${BASE}/api/settings/tiktok/connect`, {
+    method: 'POST',
+    credentials: 'include',
+  })
+  if (!res.ok) throw new Error('Failed to connect to TikTok')
+}

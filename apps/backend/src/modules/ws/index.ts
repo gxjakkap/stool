@@ -33,6 +33,8 @@ export const wsRoutes = new Elysia().ws("/ws", {
     if (emoteCache.isInitialized()) {
       sendEmotes(emoteCache.getEmotes());
     }
+    
+    ws.send(JSON.stringify({ type: "system_status", platform: "tiktok", status: chatManager.getTikTokStatus() }));
     const unsubEmotes = emoteCache.subscribe(sendEmotes);
     const unsubChat = chatManager.subscribe((msg) => {
       ws.send(JSON.stringify(msg));

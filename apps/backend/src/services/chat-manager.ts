@@ -8,6 +8,7 @@ class ChatManager {
   private twitchConnector: import("../connectors/twitch").TwitchConnector | null = null;
   private youtubeConnector: import("../connectors/youtube").YouTubeConnector | null = null;
   private tiktokConnector: import("../connectors/tiktok").TikTokConnector | null = null;
+  private tiktokStatus: "connected" | "disconnected" | "connecting" = "disconnected";
 
   subscribe(handler: MessageHandler): () => void {
     this.handlers.add(handler);
@@ -22,6 +23,10 @@ class ChatManager {
         console.error("[ChatManager] Handler error:", e);
       }
     }
+  }
+
+  getTikTokStatus() {
+    return this.tiktokStatus;
   }
 
   async startTwitch(channel: string): Promise<void> {
@@ -44,8 +49,29 @@ class ChatManager {
     if (!username) return;
     const { TikTokConnector } = await import("../connectors/tiktok");
     this.tiktokConnector?.stop();
-    this.tiktokConnector = new TikTokConnector(username, sessionId, (msg) => this.broadcast(msg));
+    this.tiktokStatus = "connecting";
+    this.broadcast({ type: "system_status", platform: "tiktok", status: "connecting" });
+    this.tiktokConnector = new TikTokConnector(
+      username, 
+      sessionId, 
+      (msg) => this.broadcast(msg),
+      (status) => {
+        this.tiktokStatus = status;
+        this.broadcast({ type: "system_status", platform: "tiktok", status });
+      }
+    );
     await this.tiktokConnector.start();
+  }
+
+  async restartTikTokFromSettings(): Promise<void> {
+    const { getSetting } = await import("../db/client");
+    const tiktokUsername = getSetting("tiktok_username") ?? "";
+    const tiktokSessionId = getSetting("tiktok_session_id") ?? undefined;
+    try {
+      await this.startTikTok(tiktokUsername, tiktokSessionId);
+    } catch (e) {
+      console.error("[ChatManager] Failed to start TikTok connector:", e);
+    }
   }
 
   stopAll(): void {

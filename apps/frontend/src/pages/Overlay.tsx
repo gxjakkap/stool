@@ -40,7 +40,7 @@ export default function Overlay() {
 
   // Add new messages
   useEffect(() => {
-    const newMsgs = messages.filter((m) => !processedIds.current.has(m.id))
+    const newMsgs = messages.filter((m) => m.type !== 'donation' && !processedIds.current.has(m.id))
     if (newMsgs.length === 0) return
 
     for (const m of newMsgs) processedIds.current.add(m.id)
@@ -101,42 +101,45 @@ export default function Overlay() {
         }
 
         // Regular chat message
-        return (
-          <div
-            key={msg.id}
-            className={cn(
-              'flex flex-col gap-0.5 rounded-lg px-3 py-2 shadow-lg backdrop-blur-sm',
-              theme === 'light'
-                ? 'bg-white/90 text-black'
-                : 'bg-black/80 text-white',
-              msg.exiting ? 'msg-expire' : 'msg-enter'
-            )}
-            style={{ animationDuration: animDuration }}
-          >
-            <div className="flex items-center gap-2">
-              <PlatformBadge platform={msg.platform} size="sm" />
-              <div className="flex items-center gap-1.5">
-                <ChatBadges badges={msg.badges} size="sm" />
-                <span
-                  className={cn(
-                    'text-sm font-semibold leading-none',
-                    theme === 'light' && !msg.userColor && 'text-zinc-800'
-                  )}
-                  style={msg.userColor ? { color: msg.userColor } : undefined}
-                >
-                  {msg.displayName}
-                </span>
-              </div>
-            </div>
-            <p
+        if (msg.type !== 'donation') {
+          return (
+            <div
+              key={msg.id}
               className={cn(
-                'text-sm leading-snug [&>img]:inline-block [&>img]:align-middle [&>img]:h-6',
-                theme === 'light' ? 'text-black/90' : 'text-white/90'
+                'flex flex-col gap-0.5 rounded-lg px-3 py-2 shadow-lg backdrop-blur-sm',
+                theme === 'light'
+                  ? 'bg-white/90 text-black'
+                  : 'bg-black/80 text-white',
+                msg.exiting ? 'msg-expire' : 'msg-enter'
               )}
-              dangerouslySetInnerHTML={{ __html: parse(msg.message) }}
-            />
-          </div>
-        )
+              style={{ animationDuration: animDuration }}
+            >
+              <div className="flex items-center gap-2">
+                <PlatformBadge platform={msg.platform} size="sm" />
+                <div className="flex items-center gap-1.5">
+                  <ChatBadges badges={msg.badges} size="sm" />
+                  <span
+                    className={cn(
+                      'text-sm font-semibold leading-none',
+                      theme === 'light' && !msg.userColor && 'text-zinc-800'
+                    )}
+                    style={msg.userColor ? { color: msg.userColor } : undefined}
+                  >
+                    {msg.displayName}
+                  </span>
+                </div>
+              </div>
+              <p
+                className={cn(
+                  'text-sm leading-snug [&>img]:inline-block [&>img]:align-middle [&>img]:h-6',
+                  theme === 'light' ? 'text-black/90' : 'text-white/90'
+                )}
+                dangerouslySetInnerHTML={{ __html: parse(msg.message) }}
+              />
+            </div>
+          )
+        }
+        return null;
       })}
     </div>
   )

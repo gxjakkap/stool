@@ -10,7 +10,8 @@ export class TikTokConnector {
   constructor(
     private username: string,
     private sessionId: string | undefined,
-    private onMessage: (msg: ChatMessage | TikTokEventMessage) => void
+    private onMessage: (msg: ChatMessage | TikTokEventMessage) => void,
+    private onStatusChange?: (status: "connected" | "disconnected" | "connecting") => void
   ) {}
 
   async start(): Promise<void> {
@@ -111,23 +112,34 @@ export class TikTokConnector {
         this.onMessage(event);
       });
 
+      this.connection.on(WebcastEvent.STREAM_END, () => {
+        console.log("[TikTok] Stream ended, stopping connection");
+        this.stop();
+      });
+
       this.connection.on(ControlEvent.ERROR, (err: any) => {
         console.error("[TikTok] Error:", err);
       });
       
       this.connection.on(ControlEvent.DISCONNECTED, () => {
-        console.log("[TikTok] Disconnected, retrying in 30s...");
-        this.scheduleRetry();
+        console.log("[TikTok] Disconnected");
+        this.onStatusChange?.("disconnected");
+        // We do not scheduleRetry here, we just stop.
+        if (!this.isStopped) {
+          this.isStopped = true;
+        }
       });
 
       await this.connection.connect();
       console.log(`[TikTok] Connected to @${normalizedUsername}`);
+      this.onStatusChange?.("connected");
     } catch (e: any) {
       const normalizedUsername = this.username.startsWith("@")
         ? this.username.slice(1)
         : this.username;
       console.error(`[TikTok] Failed to connect to @${normalizedUsername}:`, e.message || e);
-      this.scheduleRetry();
+      this.onStatusChange?.("disconnected");
+      this.isStopped = true; // Stop trying if user is not online
     }
   }
 
@@ -140,10 +152,12 @@ export class TikTokConnector {
   }
 
   stop(): void {
+    if (this.isStopped) return;
     this.isStopped = true;
     if (this.retryTimeout) clearTimeout(this.retryTimeout);
     this.connection?.disconnect();
     this.connection = null;
     console.log("[TikTok] Stopped connector");
+    this.onStatusChange?.("disconnected");
   }
 }

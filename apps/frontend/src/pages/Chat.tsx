@@ -2,10 +2,12 @@ import { useChat } from '@/lib/ws'
 import { ChatList } from '@/components/ChatList'
 import { ConnectionStatus } from '@/components/ConnectionStatus'
 import { Button } from '@/components/ui/button'
-import { Trash2, MessageSquare } from 'lucide-react'
+import { Trash2, MessageSquare, Settings } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { connectTikTok } from '@/lib/api'
 
 export default function Chat() {
-  const { messages, connected, clearMessages } = useChat()
+  const { messages, connected, tiktokStatus, clearMessages } = useChat()
 
   return (
     <div className="flex h-screen flex-col bg-[hsl(var(--background))]">
@@ -19,6 +21,20 @@ export default function Chat() {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          {tiktokStatus === 'connected' ? (
+            <div className="flex items-center gap-1.5 rounded-full bg-blue-500/15 px-2.5 py-1 text-xs font-medium text-blue-400">
+              Connected to TikTok
+            </div>
+          ) : tiktokStatus === 'connecting' ? (
+            <div className="flex items-center gap-1.5 rounded-full bg-yellow-500/15 px-2.5 py-1 text-xs font-medium text-yellow-400">
+              Connecting TikTok...
+            </div>
+          ) : (
+            <Button variant="outline" size="sm" className="h-7 text-xs px-2" onClick={() => connectTikTok()}>
+              Connect to TikTok
+            </Button>
+          )}
+          
           <ConnectionStatus connected={connected} />
           <Button
             variant="ghost"
@@ -28,6 +44,17 @@ export default function Chat() {
             aria-label="Clear all messages"
           >
             <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            asChild
+            title="Settings"
+            aria-label="Settings"
+          >
+            <Link to="/settings">
+              <Settings className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </header>

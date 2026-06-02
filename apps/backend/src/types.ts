@@ -36,8 +36,25 @@ export interface TikTokEventMessage {
   giftImageUrl?: string;
 }
 
+export interface DonationMessage {
+  id: string;
+  type: "donation";
+  referenceNo: string;
+  donatorName: string;
+  channelName: string;
+  donateMessage: string | null;
+  amount: number;
+  time: number; // unix timestamp ms
+}
+
+export interface SystemStatusMessage {
+  type: "system_status";
+  platform: "tiktok" | "twitch" | "youtube";
+  status: "connected" | "disconnected" | "connecting";
+}
+
 /** Union of all messages that can be broadcast over WebSocket */
-export type WsMessage = ChatMessage | TikTokEventMessage;
+export type WsMessage = ChatMessage | TikTokEventMessage | DonationMessage | SystemStatusMessage;
 
 // ── Emotes ────────────────────────────────────────────────────────────────────
 
