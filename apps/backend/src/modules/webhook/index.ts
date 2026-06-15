@@ -2,7 +2,6 @@ import { Elysia } from "elysia";
 import { addDonation } from "../../db/client";
 import { WebhookModel } from "./model";
 import { chatManager } from "../../services/chat-manager";
-import { TtsService } from "../../services/tts";
 
 export const webhookRoutes = new Elysia({ prefix: "/api/webhook" })
   .onError(({ code, error }) => {

@@ -17,7 +17,9 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "elysia": ["../backend/node_modules/elysia"],
+      "elysia/*": ["../backend/node_modules/elysia/*"]
     }
   },
   "include": ["src"]

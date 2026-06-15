@@ -5,7 +5,8 @@
   "packageManager": "bun@1.3.9",
   "workspaces": [
     "apps/backend",
-    "apps/frontend"
+    "apps/frontend",
+    "packages/*"
   ],
   "scripts": {
     "dev": "turbo run dev",

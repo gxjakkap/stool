@@ -143,14 +143,6 @@ export class TikTokConnector {
     }
   }
 
-  private scheduleRetry() {
-    if (this.isStopped) return;
-    if (this.retryTimeout) clearTimeout(this.retryTimeout);
-    this.retryTimeout = setTimeout(() => {
-      this.connect();
-    }, 30000);
-  }
-
   stop(): void {
     if (this.isStopped) return;
     this.isStopped = true;
