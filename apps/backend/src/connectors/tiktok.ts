@@ -11,7 +11,8 @@ export class TikTokConnector {
     private username: string,
     private sessionId: string | undefined,
     private onMessage: (msg: ChatMessage | TikTokEventMessage) => void,
-    private onStatusChange?: (status: "connected" | "disconnected" | "connecting") => void
+    private onStatusChange?: (status: "connected" | "disconnected" | "connecting") => void,
+    private signApiKey?: string
   ) {}
 
   async start(): Promise<void> {
@@ -26,10 +27,11 @@ export class TikTokConnector {
       const normalizedUsername = this.username.startsWith("@")
         ? this.username.slice(1)
         : this.username;
-      this.connection = new TikTokLiveConnection(normalizedUsername, { 
+      this.connection = new TikTokLiveConnection(normalizedUsername, {
         processInitialData: false,
         enableExtendedGiftInfo: true,
-        ...(this.sessionId ? { sessionId: this.sessionId } : {})
+        ...(this.sessionId ? { sessionId: this.sessionId } : {}),
+        ...(this.signApiKey ? { signApiKey: this.signApiKey } : {})
       });
 
       this.connection.on(WebcastEvent.CHAT, (data: any) => {

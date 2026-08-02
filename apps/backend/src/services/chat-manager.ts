@@ -45,20 +45,21 @@ class ChatManager {
     await this.youtubeConnector.start();
   }
 
-  async startTikTok(username: string, sessionId?: string): Promise<void> {
+  async startTikTok(username: string, sessionId?: string, signApiKey?: string): Promise<void> {
     if (!username) return;
     const { TikTokConnector } = await import("../connectors/tiktok");
     this.tiktokConnector?.stop();
     this.tiktokStatus = "connecting";
     this.broadcast({ type: "system_status", platform: "tiktok", status: "connecting" });
     this.tiktokConnector = new TikTokConnector(
-      username, 
-      sessionId, 
+      username,
+      sessionId,
       (msg) => this.broadcast(msg),
       (status) => {
         this.tiktokStatus = status;
         this.broadcast({ type: "system_status", platform: "tiktok", status });
-      }
+      },
+      signApiKey
     );
     await this.tiktokConnector.start();
   }
@@ -67,8 +68,9 @@ class ChatManager {
     const { getSetting } = await import("../db/client");
     const tiktokUsername = getSetting("tiktok_username") ?? "";
     const tiktokSessionId = getSetting("tiktok_session_id") ?? undefined;
+    const tiktokSignApiKey = getSetting("tiktok_sign_api_key") ?? undefined;
     try {
-      await this.startTikTok(tiktokUsername, tiktokSessionId);
+      await this.startTikTok(tiktokUsername, tiktokSessionId, tiktokSignApiKey);
     } catch (e) {
       console.error("[ChatManager] Failed to start TikTok connector:", e);
     }
@@ -91,11 +93,12 @@ class ChatManager {
     const youtubeApiKey = getSetting("youtube_api_key") ?? "";
     const tiktokUsername = getSetting("tiktok_username") ?? "";
     const tiktokSessionId = getSetting("tiktok_session_id") ?? undefined;
+    const tiktokSignApiKey = getSetting("tiktok_sign_api_key") ?? undefined;
 
     const results = await Promise.allSettled([
       this.startTwitch(twitchChannel),
       this.startYouTube(youtubeChannelId, youtubeApiKey),
-      this.startTikTok(tiktokUsername, tiktokSessionId),
+      this.startTikTok(tiktokUsername, tiktokSessionId, tiktokSignApiKey),
     ]);
 
     results.forEach((result, index) => {

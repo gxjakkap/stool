@@ -38,6 +38,7 @@ export function migrate(): void {
     youtube_channel_id: process.env.YOUTUBE_CHANNEL_ID ?? "",
     youtube_api_key: process.env.YOUTUBE_API_KEY ?? "",
     tiktok_username: process.env.TIKTOK_USERNAME ?? "",
+    tiktok_sign_api_key: process.env.TIKTOK_SIGN_API_KEY ?? "",
     overlay_expire_seconds: "30",
     overlay_max_messages: "20",
     overlay_font_size: "16",

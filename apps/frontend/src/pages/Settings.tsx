@@ -344,9 +344,22 @@ export default function Settings() {
                     Required to bypass anti-bot websocket blocks. Find this in your browser cookies (named <code>sessionid</code>).
                   </p>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="tiktok-sign-api-key">Sign API Key</Label>
+                  <Input
+                    id="tiktok-sign-api-key"
+                    type="password"
+                    placeholder="Euler Stream API key"
+                    value={s('tiktok_sign_api_key')}
+                    onChange={(e) => set('tiktok_sign_api_key', e.target.value)}
+                  />
+                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                    Get one free at eulerstream.com. Without it, anonymous signing requests get rate-limited or blocked, which shows up as "Expected 101 status code" connect failures.
+                  </p>
+                </div>
               </div>
               <Button
-                onClick={() => handleSave(['tiktok_username', 'tiktok_session_id'])}
+                onClick={() => handleSave(['tiktok_username', 'tiktok_session_id', 'tiktok_sign_api_key'])}
                 disabled={saving}
                 size="sm"
               >
