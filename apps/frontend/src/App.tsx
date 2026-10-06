@@ -46,7 +46,7 @@ export default function App() {
           {/* Public routes */}
           <Route path="/overlay" element={<Overlay />} />
           <Route path="/donation-overlay" element={<DonationOverlay />} />
-          <Route path="/commands/public" element={<PublicCommands />} />
+          <Route path="/commands" element={<PublicCommands />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 
@@ -69,7 +69,7 @@ export default function App() {
           />
 
           <Route
-            path="/commands"
+            path="/settings/commands"
             element={
               <AuthGuard>
                 <Commands />

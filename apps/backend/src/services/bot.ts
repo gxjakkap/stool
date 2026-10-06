@@ -70,7 +70,7 @@ export async function handleMessage(msg: ChatMessage): Promise<string | null> {
       return deleteCommand(args[0]) ? at(`command "${args[0]}" has been deleted`) : at(`command "${args[0]}" does not exist!`);
     }
     case "!commands":
-      return at(`here's the list of commands: ${process.env.FRONTEND_ORIGIN ?? "http://localhost:3000"}/commands/public`);
+      return at(`here's the list of commands: ${process.env.FRONTEND_ORIGIN ?? "http://localhost:3000"}/commands`);
     case "!title":
       if (!query) return at(`current title: ${(await getStreamInfo(msg.platform, 0))?.title ?? "unknown"}`);
       if (!mod) return denied;

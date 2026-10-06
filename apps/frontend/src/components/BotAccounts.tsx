@@ -55,7 +55,7 @@ export function BotAccounts() {
           </p>
         </div>
         <Button size="sm" variant="ghost" asChild>
-          <Link to="/commands">
+          <Link to="/settings/commands">
             Commands
             <ExternalLink className="ml-1.5 h-3 w-3" />
           </Link>

@@ -203,8 +203,8 @@ Validation at the boundary:
 
 ## Frontend
 
-- `/commands` (protected): Commands tab (add / edit / delete, prefix checkbox, Test button with sample args) and Timers tab.
-- `/commands/public` (public): read-only list; macros show as "dynamic". `!commands` links here.
+- `/settings/commands` (protected): Commands tab (add / edit / delete, prefix checkbox, Test button with sample args) and Timers tab.
+- `/commands` (public, same path as the old bot.guntxjakka.me/commands): read-only list; macros show as "dynamic". `!commands` links here.
 - `/settings`: new Bot tab with connect / reconnect / disconnect for each platform and role, and the redirect URI to register. The Twitch and Kick Client ID / Secret stay on the Channels tab.
 - `ChatMessage` in `lib/ws.ts` gains `isSelf`.
 

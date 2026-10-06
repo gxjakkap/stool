@@ -68,7 +68,7 @@ export default function Commands() {
           </div>
           <div className="flex gap-1">
             <Button variant="ghost" size="icon" asChild title="Public command list" aria-label="Public command list">
-              <a href="/commands/public" target="_blank" rel="noreferrer">
+              <a href="/commands" target="_blank" rel="noreferrer">
                 <ExternalLink className="h-4 w-4" />
               </a>
             </Button>

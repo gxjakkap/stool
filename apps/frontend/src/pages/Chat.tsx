@@ -46,7 +46,7 @@ export default function Chat() {
             <Trash2 className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" asChild title="Bot commands" aria-label="Bot commands">
-            <Link to="/commands">
+            <Link to="/settings/commands">
               <Bot className="h-4 w-4" />
             </Link>
           </Button>
