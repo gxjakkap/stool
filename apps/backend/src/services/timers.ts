@@ -1,8 +1,8 @@
 import type { ChatMessage } from "../types";
-import { listTimers } from "../db/client";
+import { getSetting, listTimers, setSetting } from "../db/client";
 import { renderTemplate } from "./macro";
 import { accountInfo, PLATFORMS, type Platform } from "./oauth";
-import { getStreamInfo } from "./platform-api";
+import { getStreamInfo, pinTwitchChat, sendKickChat, type StreamInfo } from "./platform-api";
 import { chatManager } from "./chat-manager";
 import { MAX_OUTPUT } from "./bot";
 
@@ -21,13 +21,17 @@ export function startTimers(): void {
 
 async function tick(): Promise<void> {
   const timers = listTimers().filter((t) => t.enabled);
-  if (!timers.length) return;
+  const pinned = getSetting("pinned_message")?.trim();
+  if (!timers.length && !pinned) return;
 
-  const live = Object.fromEntries(
+  const infos = Object.fromEntries(
     await Promise.all(
-      PLATFORMS.map(async (p) => [p, !!accountInfo(p, "bot") && !!(await getStreamInfo(p).catch(() => null))?.live] as const)
+      PLATFORMS.map(async (p) => [p, accountInfo(p, "bot") ? await getStreamInfo(p).catch(() => null) : null] as const)
     )
-  ) as Record<Platform, boolean>;
+  ) as Record<Platform, StreamInfo | null>;
+  const live = Object.fromEntries(PLATFORMS.map((p) => [p, !!infos[p]?.live])) as Record<Platform, boolean>;
+
+  if (pinned) for (const p of PLATFORMS) postPinned(p, infos[p], pinned);
 
   const now = Date.now();
   for (const t of timers) {
@@ -52,4 +56,21 @@ async function tick(): Promise<void> {
         .catch((e) => console.error(`[Timers] Timer ${t.id} on ${p} failed:`, e));
     }
   }
+}
+
+/** Once per stream: the stream start time is stored so a backend restart mid-stream does not repost. */
+function postPinned(p: Platform, info: StreamInfo | null, template: string): void {
+  if (!info?.live || !Number.isFinite(info.startedAt)) return;
+  const key = `pinned_message_${p}_stream`;
+  if (getSetting(key) === String(info.startedAt)) return;
+  // Marked before sending so a failing pin is not retried every tick
+  setSetting(key, String(info.startedAt));
+  renderTemplate(template, { user: "", args: [], query: "", platform: p })
+    .then((text) => {
+      text = text.trim().slice(0, MAX_OUTPUT);
+      if (!text) return;
+      // Kick's public API has no pin endpoint, so Kick only gets the message
+      return p === "twitch" ? pinTwitchChat(text) : sendKickChat(text);
+    })
+    .catch((e) => console.error(`[Timers] Pinned message on ${p} failed:`, e));
 }

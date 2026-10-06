@@ -10,6 +10,8 @@ import {
   createTimer,
   updateTimer,
   removeTimer,
+  getSettings,
+  updateSettings,
   type BotCommand,
   type BotTimer,
   type BotPlatform,
@@ -20,7 +22,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Toaster } from '@/components/ui/toaster'
 import { toast } from '@/components/ui/use-toast'
-import { Bot, Clock, ExternalLink, FlaskConical, Pencil, Plus, RefreshCw, Settings, Trash2, X } from 'lucide-react'
+import { Bot, Clock, ExternalLink, FlaskConical, Pencil, Pin, Plus, RefreshCw, Save, Settings, Trash2, X } from 'lucide-react'
 
 const textareaClass =
   'flex min-h-20 w-full rounded-md border border-[hsl(var(--input))] bg-[hsl(var(--input))] px-3 py-2 font-mono text-sm shadow-sm placeholder:text-[hsl(var(--muted-foreground))] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[hsl(var(--ring))]'
@@ -92,12 +94,19 @@ export default function Commands() {
               <Clock className="h-3.5 w-3.5" />
               Timers
             </TabsTrigger>
+            <TabsTrigger value="pinned" className="gap-1.5">
+              <Pin className="h-3.5 w-3.5" />
+              Pinned
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="commands">
             <CommandsTab commands={commands} reload={reload} />
           </TabsContent>
           <TabsContent value="timers">
             <TimersTab timers={timers} reload={reload} />
+          </TabsContent>
+          <TabsContent value="pinned">
+            <PinnedTab />
           </TabsContent>
         </Tabs>
       </main>
@@ -433,5 +442,52 @@ function TimersTab({ timers, reload }: { timers: BotTimer[]; reload: () => Promi
         )}
       </section>
     </div>
+  )
+}
+
+function PinnedTab() {
+  const [message, setMessage] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    getSettings()
+      .then((s) => setMessage(s.pinned_message ?? ''))
+      .catch(fail)
+  }, [])
+
+  const save = async () => {
+    setSaving(true)
+    try {
+      await updateSettings({ pinned_message: message })
+      toast({ title: 'Pinned message saved' })
+    } catch (e) {
+      fail(e)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <section className="space-y-4 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4">
+      <h2 className="text-sm font-semibold">Stream start message</h2>
+      <div className="space-y-1">
+        <Label htmlFor="pinned-message">Message</Label>
+        <textarea
+          id="pinned-message"
+          className={textareaClass}
+          placeholder="Donate >> https://... Subscribe >> https://... Macros with ${ } work here too."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+      </div>
+      <p className="text-xs text-[hsl(var(--muted-foreground))]">
+        Posted by the bot once per stream on each platform that goes live. On Twitch it is pinned until the stream ends
+        (the bot must be a moderator). Kick has no pin API, so there it is only sent. Leave empty to disable.
+      </p>
+      <Button size="sm" onClick={save} disabled={saving}>
+        {saving ? <RefreshCw className="mr-1.5 h-3 w-3 animate-spin" /> : <Save className="mr-1.5 h-3 w-3" />}
+        Save
+      </Button>
+    </section>
   )
 }
