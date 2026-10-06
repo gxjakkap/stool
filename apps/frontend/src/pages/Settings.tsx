@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Toaster } from '@/components/ui/toaster'
 import { toast } from '@/components/ui/use-toast'
 import { TikTokIcon, KickIcon } from '@/components/PlatformBadge'
+import { BotAccounts } from '@/components/BotAccounts'
 import {
   Settings2,
   Twitch,
@@ -22,6 +23,7 @@ import {
   ShieldCheck,
   LogOut,
   HeartHandshake,
+  Bot,
 } from 'lucide-react'
 
 interface Token {
@@ -190,11 +192,15 @@ export default function Settings() {
       </header>
 
       <main className="mx-auto max-w-3xl px-6 py-8">
-        <Tabs defaultValue="channels">
+        <Tabs defaultValue={/[?&]bot_(connected|error)=/.test(window.location.search) ? 'bot' : 'channels'}>
           <TabsList className="mb-8 flex w-fit flex-wrap gap-0.5">
             <TabsTrigger value="channels" className="gap-1.5">
               <MessageSquare className="h-3.5 w-3.5" />
               Channels
+            </TabsTrigger>
+            <TabsTrigger value="bot" className="gap-1.5">
+              <Bot className="h-3.5 w-3.5" />
+              Bot
             </TabsTrigger>
             <TabsTrigger value="overlay" className="gap-1.5">
               <Monitor className="h-3.5 w-3.5" />
@@ -512,6 +518,10 @@ export default function Settings() {
               {saving && <RefreshCw className="mr-1.5 h-3 w-3 animate-spin" />}
               Save Overlay Settings
             </Button>
+          </TabsContent>
+
+          <TabsContent value="bot">
+            <BotAccounts />
           </TabsContent>
 
           {/* ── Tokens ── */}

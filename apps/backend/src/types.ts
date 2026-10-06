@@ -17,6 +17,8 @@ export interface ChatMessage {
   timestamp: number;
   userColor?: string;
   badges?: string[];
+  /** Sent by our own bot account: never handled as a command */
+  isSelf?: boolean;
 }
 
 export type PlatformEventKind = "gift" | "follow" | "share" | "sub" | "gift_sub";

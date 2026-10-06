@@ -30,6 +30,24 @@ export function migrate(): void {
       amount NUMERIC NOT NULL,
       time INTEGER NOT NULL,
       read BOOLEAN DEFAULT FALSE
+    );
+
+    CREATE TABLE IF NOT EXISTS commands (
+      trigger TEXT PRIMARY KEY,
+      response TEXT NOT NULL,
+      prefix_user BOOLEAN NOT NULL DEFAULT TRUE,
+      created_by TEXT NOT NULL,
+      created_at INTEGER DEFAULT (unixepoch()),
+      updated_at INTEGER DEFAULT (unixepoch())
+    );
+
+    CREATE TABLE IF NOT EXISTS timers (
+      id INTEGER PRIMARY KEY,
+      message TEXT NOT NULL,
+      interval_minutes INTEGER NOT NULL,
+      min_lines INTEGER NOT NULL DEFAULT 0,
+      platforms TEXT NOT NULL,
+      enabled BOOLEAN NOT NULL DEFAULT TRUE
     )
   `);
 

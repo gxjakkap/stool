@@ -7,6 +7,10 @@ import { tokenRoutes } from "./modules/token/index";
 import { wsRoutes } from "./modules/ws/index";
 import { webhookRoutes } from "./modules/webhook/index";
 import { ttsRoutes } from "./modules/tts/index";
+import { commandRoutes } from "./modules/commands/index";
+import { botRoutes } from "./modules/bot/index";
+import { startBot } from "./services/bot";
+import { startTimers } from "./services/timers";
 import { chatManager } from "./services/chat-manager";
 import { emoteCache } from "./services/emote-cache";
 
@@ -28,6 +32,8 @@ const app = new Elysia()
   .use(wsRoutes)
   .use(webhookRoutes)
   .use(ttsRoutes)
+  .use(commandRoutes)
+  .use(botRoutes)
   .get("/health", () => ({ ok: true, timestamp: Date.now() }))
   .listen({ port: PORT, hostname: "0.0.0.0" });
 
@@ -36,6 +42,8 @@ console.log(`[stool backend] Listening on http://localhost:${PORT}`);
 // Start chat connectors and emote cache from saved settings
 chatManager.restartFromSettings().catch(console.error);
 emoteCache.init().catch(console.error);
+startBot();
+startTimers();
 
 // Catch unhandled exceptions (like third-party websocket errors) so the server doesn't crash
 process.on("uncaughtException", (error) => {

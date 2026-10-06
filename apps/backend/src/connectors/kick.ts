@@ -101,6 +101,7 @@ export async function verifyKickSignature(
 // ── Event mapping ─────────────────────────────────────────────────────────────
 
 interface KickUser {
+  user_id?: number;
   username: string;
   is_anonymous?: boolean;
   identity?: { username_color?: string; badges?: { type: string }[] } | null;
@@ -113,7 +114,8 @@ function name(u: KickUser | undefined): string {
 export function mapKickEvent(
   type: string,
   id: string,
-  p: any
+  p: any,
+  botUserId = ""
 ): ChatMessage | PlatformEventMessage | null {
   if (type === "chat.message.sent") {
     const sender: KickUser = p.sender;
@@ -126,6 +128,7 @@ export function mapKickEvent(
       timestamp: Date.now(),
       userColor: sender.identity?.username_color ?? undefined,
       badges: sender.identity?.badges?.map((b) => b.type) ?? [],
+      isSelf: !!botUserId && String(sender.user_id) === botUserId,
     };
   }
 

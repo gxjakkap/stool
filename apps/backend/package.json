@@ -17,6 +17,7 @@
     "googleapis": "latest",
     "nanoid": "latest",
     "openid-client": "latest",
+    "quickjs-emscripten": "^0.32.0",
     "tiktok-live-connector": "2.3.0-beta1",
     "tmi.js": "latest"
   },

@@ -25,6 +25,16 @@ class ChatManager {
     }
   }
 
+  /** Sends a chat message as the bot account on the given platform. */
+  async say(platform: "twitch" | "kick", text: string): Promise<void> {
+    if (platform === "twitch") {
+      if (!this.twitchConnector) throw new Error("twitch not connected");
+      return this.twitchConnector.say(text);
+    }
+    const { sendKickChat } = await import("./platform-api");
+    return sendKickChat(text);
+  }
+
   getTikTokStatus() {
     return this.tiktokStatus;
   }
@@ -32,8 +42,11 @@ class ChatManager {
   async startTwitch(channel: string): Promise<void> {
     if (!channel) return;
     const { TwitchConnector } = await import("../connectors/twitch");
+    const { accountInfo, getUserToken } = await import("./oauth");
+    const acct = accountInfo("twitch", "bot");
+    const bot = acct && { login: acct.login, getToken: async () => (await getUserToken("twitch", "bot")) ?? "" };
     this.twitchConnector?.stop();
-    this.twitchConnector = new TwitchConnector(channel, (msg) => this.broadcast(msg));
+    this.twitchConnector = new TwitchConnector(channel, (msg) => this.broadcast(msg), bot ?? undefined);
     await this.twitchConnector.start();
   }
 
