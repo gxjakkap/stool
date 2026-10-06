@@ -7,6 +7,8 @@ const Overlay = lazy(() => import('./pages/Overlay'))
 const DonationOverlay = lazy(() => import('./pages/DonationOverlay'))
 const Chat = lazy(() => import('./pages/Chat'))
 const Settings = lazy(() => import('./pages/Settings'))
+const Commands = lazy(() => import('./pages/Commands'))
+const PublicCommands = lazy(() => import('./pages/PublicCommands'))
 const Login = lazy(() => import('./pages/Login'))
 const AuthCallback = lazy(() => import('./pages/AuthCallback'))
 
@@ -44,6 +46,7 @@ export default function App() {
           {/* Public routes */}
           <Route path="/overlay" element={<Overlay />} />
           <Route path="/donation-overlay" element={<DonationOverlay />} />
+          <Route path="/commands/public" element={<PublicCommands />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 
@@ -61,6 +64,15 @@ export default function App() {
             element={
               <AuthGuard>
                 <Settings />
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/commands"
+            element={
+              <AuthGuard>
+                <Commands />
               </AuthGuard>
             }
           />

@@ -6,6 +6,7 @@ const pem = publicKey.export({ type: "spki", format: "pem" }).toString();
 globalThis.fetch = mock(async () => Response.json({ data: { public_key: pem } })) as any;
 
 process.env.DB_PATH = ":memory:";
+(await import("../db/schema")).migrate();
 const { webhookRoutes } = await import("../modules/webhook");
 const { chatManager } = await import("../services/chat-manager");
 const { Elysia } = await import("elysia");

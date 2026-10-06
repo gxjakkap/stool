@@ -58,11 +58,17 @@ apps/
 - `ws/` — WebSocket endpoint at `/ws`. Auth via session cookie **or** `?token=` query param. On connect: sends current emote cache, current TikTok status, then subscribes to `chatManager` and `emoteCache`.
 - `webhook/` — `POST /api/webhook/ezdn` receives donations from ezdn, persists them, and broadcasts a `DonationMessage` via `chatManager`. `POST /api/webhook/kick` receives Kick events, verifies the RSA signature, and broadcasts them.
 - `tts/` — `GET /api/tts?text=&voice=` proxies Google Translate TTS and returns base64 audio.
+- `commands/`: bot command and timer CRUD, `POST /api/commands/test`, public `GET /api/commands/public`.
+- `bot/`: bot/broadcaster account OAuth (`/api/bot/oauth/...`) and `GET /api/bot/status`.
 
 **Services** (singletons in `services/`):
 - `chat-manager.ts` — `ChatManager` singleton. Holds connector instances and a `Set` of subscriber callbacks. All connectors call `chatManager.broadcast(msg)` to fan-out to WebSocket clients. `restartFromSettings()` is called on startup and after settings saves.
 - `emote-cache.ts` — fetches and caches Twitch emotes (via `@mkody/twitch-emoticons`), pushes to WS clients on update.
 - `tts.ts` — `TtsService.generate(text, lang)` — calls Google Translate TTS, returns base64 data URI.
+- `bot.ts`: chat bot for Twitch and Kick: custom commands plus built-ins (`!addcom`, `!editcom`, `!delcom`, `!commands`, `!title`, `!game`, `!uptime`). Spec: `docs/specs/chat-bot.md`.
+- `macro.ts`: renders `${ expr }` segments in a QuickJS WASM sandbox with a restricted `fetch` (public addresses only).
+- `timers.ts`: posts timer messages while live, gated by interval and chat activity per platform.
+- `oauth.ts`: OAuth token storage/refresh for bot and broadcaster accounts; `platform-api.ts`: stream info, title/category updates, Kick chat send.
 
 **Connectors** (`connectors/`): `twitch.ts` (tmi.js), `youtube.ts` (googleapis polling), `tiktok.ts` (tiktok-live-connector), `kick.ts` (official Kick API: on start it recreates webhook event subscriptions with an app access token; events arrive via the webhook route). Each wraps a third-party library and normalizes events into the shared `WsMessage` union.
 

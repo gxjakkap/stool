@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { addDonation } from "../../db/client";
+import { addDonation, getSetting } from "../../db/client";
 import { WebhookModel } from "./model";
 import { chatManager } from "../../services/chat-manager";
 import { mapKickEvent, verifyKickSignature } from "../../connectors/kick";
@@ -57,7 +57,12 @@ export const webhookRoutes = new Elysia({ prefix: "/api/webhook" })
         set.status = 401;
         return "invalid signature";
       }
-      const msg = mapKickEvent(headers["kick-event-type"] ?? "", id, JSON.parse(body));
+      const msg = mapKickEvent(
+        headers["kick-event-type"] ?? "",
+        id,
+        JSON.parse(body),
+        getSetting("kick_bot_user_id") ?? ""
+      );
       if (msg) chatManager.broadcast(msg);
       return "ok";
     },

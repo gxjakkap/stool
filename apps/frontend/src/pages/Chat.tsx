@@ -2,7 +2,7 @@ import { useChat } from '@/lib/ws'
 import { ChatList } from '@/components/ChatList'
 import { ConnectionStatus } from '@/components/ConnectionStatus'
 import { Button } from '@/components/ui/button'
-import { Trash2, MessageSquare, Settings } from 'lucide-react'
+import { Trash2, MessageSquare, Settings, Bot } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { connectTikTok } from '@/lib/api'
 
@@ -44,6 +44,11 @@ export default function Chat() {
             aria-label="Clear all messages"
           >
             <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" asChild title="Bot commands" aria-label="Bot commands">
+            <Link to="/commands">
+              <Bot className="h-4 w-4" />
+            </Link>
           </Button>
           <Button
             variant="ghost"

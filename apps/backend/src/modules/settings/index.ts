@@ -3,6 +3,7 @@ import { getAllSettings, getSetting, setSetting } from "../../db/client";
 import { chatManager } from "../../services/chat-manager";
 import { SettingsModel } from "./model";
 import { authGuard } from "../auth/guard";
+import { isSecretKey } from "../../services/oauth";
 
 const CHANNEL_KEYS = [
   "twitch_channel",
@@ -12,6 +13,8 @@ const CHANNEL_KEYS = [
   "kick_channel",
   "kick_client_id",
   "kick_client_secret",
+  "twitch_client_id",
+  "twitch_client_secret",
 ];
 
 export const settingsRoutes = new Elysia({ prefix: "/api/settings" })
@@ -22,13 +25,15 @@ export const settingsRoutes = new Elysia({ prefix: "/api/settings" })
     "settings.okResponse": SettingsModel.okResponse,
   })
   .use(authGuard)
-  .get("/", () => getAllSettings(), {
+  .get("/", () => Object.fromEntries(Object.entries(getAllSettings()).filter(([k]) => !isSecretKey(k))), {
     response: { 200: "settings.map" },
   })
   .put(
     "/",
     async ({ body }) => {
       for (const [key, value] of Object.entries(body)) {
+        // OAuth tokens are only written by the connect flow
+        if (isSecretKey(key)) continue;
         setSetting(key, value);
       }
       const hasChannelChange = Object.keys(body).some((k) =>
@@ -47,7 +52,7 @@ export const settingsRoutes = new Elysia({ prefix: "/api/settings" })
   .get(
     "/:key",
     ({ params }) => {
-      const value = getSetting(params.key);
+      const value = isSecretKey(params.key) ? null : getSetting(params.key);
       if (value === null) return new Response("Not found", { status: 404 });
       return { key: params.key, value };
     },
