@@ -2,6 +2,7 @@ import { Elysia } from "elysia";
 import { addDonation } from "../../db/client";
 import { WebhookModel } from "./model";
 import { chatManager } from "../../services/chat-manager";
+import { mapKickEvent, verifyKickSignature } from "../../connectors/kick";
 
 export const webhookRoutes = new Elysia({ prefix: "/api/webhook" })
   .onError(({ code, error }) => {
@@ -37,4 +38,29 @@ export const webhookRoutes = new Elysia({ prefix: "/api/webhook" })
       body: "webhook.ezdnBody",
       response: { 200: "webhook.ezdnResponse" },
     }
+  )
+  .post(
+    "/kick",
+    async ({ body: raw, headers, set }) => {
+      const body = raw as string;
+      const id = headers["kick-event-message-id"] ?? "";
+      const ok = await verifyKickSignature(
+        id,
+        headers["kick-event-message-timestamp"] ?? "",
+        body,
+        headers["kick-event-signature"] ?? ""
+      ).catch((e) => {
+        console.error("[Webhook] Kick signature check failed:", e);
+        return false;
+      });
+      if (!ok) {
+        set.status = 401;
+        return "invalid signature";
+      }
+      const msg = mapKickEvent(headers["kick-event-type"] ?? "", id, JSON.parse(body));
+      if (msg) chatManager.broadcast(msg);
+      return "ok";
+    },
+    // Raw text body: the signature covers the exact bytes Kick sent
+    { parse: "text" }
   );

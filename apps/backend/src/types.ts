@@ -10,7 +10,7 @@ import type { TokenModel } from "./modules/token/model";
 export interface ChatMessage {
   id: string;
   type?: "chat";
-  platform: "twitch" | "youtube" | "tiktok";
+  platform: "twitch" | "youtube" | "tiktok" | "kick";
   username: string;
   displayName: string;
   message: string;
@@ -19,20 +19,21 @@ export interface ChatMessage {
   badges?: string[];
 }
 
-export type TikTokEventKind = "gift" | "follow" | "share";
+export type PlatformEventKind = "gift" | "follow" | "share" | "sub" | "gift_sub";
 
-export interface TikTokEventMessage {
+export interface PlatformEventMessage {
   id: string;
-  type: "tiktok_event";
-  platform: "tiktok";
-  kind: TikTokEventKind;
+  type: "platform_event";
+  platform: "tiktok" | "kick";
+  kind: PlatformEventKind;
   username: string;
   displayName: string;
   timestamp: number;
-  /** Gift-specific fields */
-  giftName?: string;
+  /** gift: item count. sub: months. gift_sub: number of subs gifted. */
   giftCount?: number;
-  giftDiamonds?: number;
+  giftName?: string;
+  /** Per-item value: TikTok diamonds or Kick kicks */
+  giftValue?: number;
   giftImageUrl?: string;
 }
 
@@ -54,7 +55,7 @@ export interface SystemStatusMessage {
 }
 
 /** Union of all messages that can be broadcast over WebSocket */
-export type WsMessage = ChatMessage | TikTokEventMessage | DonationMessage | SystemStatusMessage;
+export type WsMessage = ChatMessage | PlatformEventMessage | DonationMessage | SystemStatusMessage;
 
 // ── Emotes ────────────────────────────────────────────────────────────────────
 

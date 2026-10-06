@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Toaster } from '@/components/ui/toaster'
 import { toast } from '@/components/ui/use-toast'
-import { TikTokIcon } from '@/components/PlatformBadge'
+import { TikTokIcon, KickIcon } from '@/components/PlatformBadge'
 import {
   Settings2,
   Twitch,
@@ -260,6 +260,59 @@ export default function Settings() {
               
               <Button
                 onClick={() => handleSave(['twitch_channel', 'twitch_client_id', 'twitch_client_secret'])}
+                disabled={saving}
+                size="sm"
+              >
+                {saving && <RefreshCw className="mr-1.5 h-3 w-3 animate-spin" />}
+                Save
+              </Button>
+            </section>
+
+            <Separator />
+
+            {/* Kick */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <KickIcon className="h-4 w-4 text-[#53FC18]" />
+                <h2 className="text-sm font-semibold">Kick</h2>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="kick-channel">Channel name</Label>
+                <Input
+                  id="kick-channel"
+                  placeholder="Your Kick channel"
+                  value={s('kick_channel')}
+                  onChange={(e) => set('kick_channel', e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="kick-client-id">Client ID</Label>
+                <Input
+                  id="kick-client-id"
+                  value={s('kick_client_id')}
+                  onChange={(e) => set('kick_client_id', e.target.value)}
+                  placeholder="Kick App Client ID"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="kick-client-secret">Client Secret</Label>
+                <Input
+                  id="kick-client-secret"
+                  type="password"
+                  value={s('kick_client_secret')}
+                  onChange={(e) => set('kick_client_secret', e.target.value)}
+                  placeholder="Kick App Client Secret"
+                />
+              </div>
+
+              <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                Set the webhook URL in your Kick app to <code>{'<backend origin>'}/api/webhook/kick</code>. Leave the channel empty to disable.
+              </p>
+
+              <Button
+                onClick={() => handleSave(['kick_channel', 'kick_client_id', 'kick_client_secret'])}
                 disabled={saving}
                 size="sm"
               >

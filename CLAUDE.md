@@ -56,7 +56,7 @@ apps/
 - `settings/` — CRUD for key/value settings table. Saving settings triggers connector restarts.
 - `token/` — Overlay token management (`overlay_tokens` table). Tokens allow unauthenticated WebSocket access for OBS browser sources.
 - `ws/` — WebSocket endpoint at `/ws`. Auth via session cookie **or** `?token=` query param. On connect: sends current emote cache, current TikTok status, then subscribes to `chatManager` and `emoteCache`.
-- `webhook/` — `POST /api/webhook/ezdn` receives donations from ezdn, persists them, and broadcasts a `DonationMessage` via `chatManager`.
+- `webhook/` — `POST /api/webhook/ezdn` receives donations from ezdn, persists them, and broadcasts a `DonationMessage` via `chatManager`. `POST /api/webhook/kick` receives Kick events, verifies the RSA signature, and broadcasts them.
 - `tts/` — `GET /api/tts?text=&voice=` proxies Google Translate TTS and returns base64 audio.
 
 **Services** (singletons in `services/`):
@@ -64,9 +64,9 @@ apps/
 - `emote-cache.ts` — fetches and caches Twitch emotes (via `@mkody/twitch-emoticons`), pushes to WS clients on update.
 - `tts.ts` — `TtsService.generate(text, lang)` — calls Google Translate TTS, returns base64 data URI.
 
-**Connectors** (`connectors/`): `twitch.ts` (tmi.js), `youtube.ts` (googleapis polling), `tiktok.ts` (tiktok-live-connector). Each wraps a third-party library and normalizes events into the shared `WsMessage` union.
+**Connectors** (`connectors/`): `twitch.ts` (tmi.js), `youtube.ts` (googleapis polling), `tiktok.ts` (tiktok-live-connector), `kick.ts` (official Kick API: on start it recreates webhook event subscriptions with an app access token; events arrive via the webhook route). Each wraps a third-party library and normalizes events into the shared `WsMessage` union.
 
-**Shared types** (`types.ts`): `ChatMessage`, `TikTokEventMessage`, `DonationMessage`, `SystemStatusMessage`, `WsMessage` union. These are the canonical types — the frontend duplicates them in `lib/ws.ts` (keep in sync manually).
+**Shared types** (`types.ts`): `ChatMessage`, `PlatformEventMessage` (TikTok and Kick gifts/follows/subs), `DonationMessage`, `SystemStatusMessage`, `WsMessage` union. These are the canonical types — the frontend duplicates them in `lib/ws.ts` (keep in sync manually).
 
 **Auth model:** OIDC configured via settings (`oidc_issuer`, `oidc_client_id`, etc.). Sessions are in-memory only — they are lost on server restart.
 

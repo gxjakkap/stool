@@ -37,6 +37,13 @@ class ChatManager {
     await this.twitchConnector.start();
   }
 
+  async startKick(channel: string, clientId: string, clientSecret: string): Promise<void> {
+    if (!clientId || !clientSecret) return;
+    const { KickConnector } = await import("../connectors/kick");
+    // Runs even with an empty channel so old subscriptions get deleted
+    await new KickConnector(channel, clientId, clientSecret).start();
+  }
+
   async startYouTube(channelId: string, apiKey: string): Promise<void> {
     if (!channelId || !apiKey) return;
     const { YouTubeConnector } = await import("../connectors/youtube");
@@ -94,16 +101,20 @@ class ChatManager {
     const tiktokUsername = getSetting("tiktok_username") ?? "";
     const tiktokSessionId = getSetting("tiktok_session_id") ?? undefined;
     const tiktokSignApiKey = getSetting("tiktok_sign_api_key") ?? undefined;
+    const kickChannel = getSetting("kick_channel") ?? "";
+    const kickClientId = getSetting("kick_client_id") ?? "";
+    const kickClientSecret = getSetting("kick_client_secret") ?? "";
 
     const results = await Promise.allSettled([
       this.startTwitch(twitchChannel),
       this.startYouTube(youtubeChannelId, youtubeApiKey),
       this.startTikTok(tiktokUsername, tiktokSessionId, tiktokSignApiKey),
+      this.startKick(kickChannel, kickClientId, kickClientSecret),
     ]);
 
     results.forEach((result, index) => {
       if (result.status === "rejected") {
-        const platforms = ["Twitch", "YouTube", "TikTok"];
+        const platforms = ["Twitch", "YouTube", "TikTok", "Kick"];
         console.error(`[ChatManager] Failed to start ${platforms[index]} connector:`, result.reason);
       }
     });
