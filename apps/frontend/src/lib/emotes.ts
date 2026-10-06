@@ -34,6 +34,12 @@ function escapeHtml(s: string): string {
 function parseMessage(text: string): string {
   return text.split(/(\s+)/).map(token => {
     if (/^\s+$/.test(token)) return token
+    // Kick native emotes arrive inline as [emote:ID:name]
+    const kick = token.match(/^\[emote:(\d+):([^\]]+)\]$/)
+    if (kick) {
+      const safe = escapeHtml(kick[2])
+      return `<img alt="${safe}" title="${safe}" class="twitch-emote inline-block align-middle h-6" src="https://files.kick.com/emotes/${kick[1]}/fullsize">`
+    }
     const url = emoteMap.get(token)
     if (!url) return escapeHtml(token)
     const safe = escapeHtml(token)

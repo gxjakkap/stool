@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useChat, type ChatMessage, type TikTokEventMessage } from '@/lib/ws'
+import { useChat, type ChatMessage, type PlatformEventMessage } from '@/lib/ws'
 import { PlatformBadge } from '@/components/PlatformBadge'
 import { ChatBadges } from '@/components/ChatBadges'
-import { TikTokEventBubble } from '@/components/TikTokEventBubble'
+import { EventBubble } from '@/components/EventBubble'
 import { cn } from '@/lib/utils'
 
-type OverlayMessage = (ChatMessage | TikTokEventMessage) & {
+type OverlayMessage = (ChatMessage | PlatformEventMessage) & {
   expireAt: number
   exiting: boolean
 }
@@ -40,7 +40,7 @@ export default function Overlay() {
 
   // Add new messages
   useEffect(() => {
-    const validMsgs = messages.filter((m): m is ChatMessage | TikTokEventMessage => m.type !== 'donation' && m.type !== 'system_status')
+    const validMsgs = messages.filter((m): m is ChatMessage | PlatformEventMessage => m.type !== 'donation' && m.type !== 'system_status')
     const newMsgs = validMsgs.filter((m) => !processedIds.current.has(m.id))
     
     if (newMsgs.length === 0) return
@@ -89,15 +89,15 @@ export default function Overlay() {
       style={{ fontSize: `${fontSize}px`, background: 'transparent' }}
     >
       {[...overlayMessages].reverse().map((msg) => {
-        // TikTok social events (gift / follow / share)
-        if (msg.type === 'tiktok_event') {
+        // Platform events (gift / follow / share / sub)
+        if (msg.type === 'platform_event') {
           return (
             <div
               key={msg.id}
               className={cn(msg.exiting ? 'msg-expire' : 'msg-enter')}
               style={{ animationDuration: animDuration }}
             >
-              <TikTokEventBubble event={msg} compact theme={theme} />
+              <EventBubble event={msg} compact theme={theme} />
             </div>
           )
         }

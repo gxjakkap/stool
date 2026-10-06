@@ -1,6 +1,6 @@
 import { TikTokLiveConnection, WebcastEvent, ControlEvent } from "tiktok-live-connector";
 import { nanoid } from "nanoid";
-import type { ChatMessage, TikTokEventMessage } from "../types";
+import type { ChatMessage, PlatformEventMessage } from "../types";
 
 export class TikTokConnector {
   private connection: TikTokLiveConnection | null = null;
@@ -10,7 +10,7 @@ export class TikTokConnector {
   constructor(
     private username: string,
     private sessionId: string | undefined,
-    private onMessage: (msg: ChatMessage | TikTokEventMessage) => void,
+    private onMessage: (msg: ChatMessage | PlatformEventMessage) => void,
     private onStatusChange?: (status: "connected" | "disconnected" | "connecting") => void,
     private signApiKey?: string
   ) {}
@@ -59,14 +59,14 @@ export class TikTokConnector {
         const extended = data.extendedGiftInfo;
         const giftName = extended?.name ?? `Gift #${data.giftId ?? "?"}`;
         const giftCount = data.repeatCount ?? 1;
-        const giftDiamonds = extended?.diamondCount;
+        const giftValue = extended?.diamondCount;
         const giftImageUrl = extended?.image?.urlList?.[0] ?? extended?.imageUrl;
 
         console.log(`[TikTok] Gift from ${uniqueId}: ${giftName} x${giftCount}`);
 
-        const event: TikTokEventMessage = {
+        const event: PlatformEventMessage = {
           id: data.common?.msgId?.toString() ?? nanoid(),
-          type: "tiktok_event",
+          type: "platform_event",
           platform: "tiktok",
           kind: "gift",
           username: uniqueId,
@@ -74,7 +74,7 @@ export class TikTokConnector {
           timestamp: Date.now(),
           giftName,
           giftCount,
-          giftDiamonds,
+          giftValue,
           giftImageUrl,
         };
         this.onMessage(event);
@@ -85,9 +85,9 @@ export class TikTokConnector {
         const nickname = data.user?.nickname ?? uniqueId;
         console.log(`[TikTok] Follow from ${uniqueId}`);
 
-        const event: TikTokEventMessage = {
+        const event: PlatformEventMessage = {
           id: data.common?.msgId?.toString() ?? nanoid(),
-          type: "tiktok_event",
+          type: "platform_event",
           platform: "tiktok",
           kind: "follow",
           username: uniqueId,
@@ -102,9 +102,9 @@ export class TikTokConnector {
         const nickname = data.user?.nickname ?? uniqueId;
         console.log(`[TikTok] Share from ${uniqueId}`);
 
-        const event: TikTokEventMessage = {
+        const event: PlatformEventMessage = {
           id: data.common?.msgId?.toString() ?? nanoid(),
-          type: "tiktok_event",
+          type: "platform_event",
           platform: "tiktok",
           kind: "share",
           username: uniqueId,

@@ -10,6 +10,15 @@ function TikTokIcon({ className }: { className?: string }) {
   )
 }
 
+// Kick icon: not in Lucide, use custom SVG
+function KickIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M3 3h6v6h3V6h3V3h6v6h-3v6h3v6h-6v-3h-3v-3H9v6H3z" />
+    </svg>
+  )
+}
+
 const PLATFORM_CONFIG = {
   twitch: {
     label: 'Twitch',
@@ -26,10 +35,15 @@ const PLATFORM_CONFIG = {
     color: 'bg-[#00f2ea]/20 text-[#00f2ea] border-[#00f2ea]/30',
     icon: TikTokIcon,
   },
+  kick: {
+    label: 'Kick',
+    color: 'bg-[#53FC18]/20 text-[#53FC18] border-[#53FC18]/30',
+    icon: KickIcon,
+  },
 } as const
 
 interface PlatformBadgeProps {
-  platform: 'twitch' | 'youtube' | 'tiktok'
+  platform: keyof typeof PLATFORM_CONFIG
   className?: string
   size?: 'sm' | 'md'
 }
@@ -54,4 +68,4 @@ export function PlatformBadge({ platform, className, size = 'sm' }: PlatformBadg
 }
 
 // Export TikTokIcon for use in other components (e.g. Settings)
-export { TikTokIcon }
+export { TikTokIcon, KickIcon }

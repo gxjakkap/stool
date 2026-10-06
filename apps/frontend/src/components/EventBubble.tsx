@@ -1,9 +1,10 @@
 import { cn } from '@/lib/utils'
-import type { TikTokEventMessage } from '@/lib/ws'
-import { Gift, UserPlus, Share2 } from 'lucide-react'
+import type { PlatformEventMessage } from '@/lib/ws'
+import { Gift, UserPlus, Share2, Star, Gem } from 'lucide-react'
+import { PlatformBadge } from './PlatformBadge'
 
-interface TikTokEventBubbleProps {
-  event: TikTokEventMessage
+interface EventBubbleProps {
+  event: PlatformEventMessage
   className?: string
   /** When true, omit the timestamp hover label (used in overlay) */
   compact?: boolean
@@ -30,16 +31,34 @@ const KIND_CONFIG = {
     bgClass: 'bg-[#339af0]/10 border border-[#339af0]/20',
     label: 'shared the stream',
   },
+  sub: {
+    icon: Star,
+    accentClass: 'text-[#53FC18]',
+    bgClass: 'bg-[#53FC18]/10 border border-[#53FC18]/20',
+    label: 'subscribed',
+  },
+  gift_sub: {
+    icon: Gift,
+    accentClass: 'text-[#53FC18]',
+    bgClass: 'bg-[#53FC18]/10 border border-[#53FC18]/20',
+    label: 'gifted subs',
+  },
 } as const
 
-export function TikTokEventBubble({
+export function EventBubble({
   event,
   className,
   compact = false,
   theme,
-}: TikTokEventBubbleProps) {
+}: EventBubbleProps) {
   const config = KIND_CONFIG[event.kind]
   const Icon = config.icon
+
+  const count = event.giftCount ?? 1
+  const label =
+    event.kind === 'sub' && count > 1 ? `subscribed for ${count} months`
+    : event.kind === 'gift_sub' ? `gifted ${count} sub${count > 1 ? 's' : ''}`
+    : config.label
 
   const timeStr = new Date(event.timestamp).toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -64,11 +83,12 @@ export function TikTokEventBubble({
       <div className="min-w-0 flex-1">
         {/* Name + action */}
         <p className={cn('text-sm leading-snug', theme === 'light' ? 'text-black/90' : 'text-white/90')}>
+          <PlatformBadge platform={event.platform} className="mr-1.5 align-middle" />
           <span className={cn('font-semibold', config.accentClass)}>
             {event.displayName}
           </span>{' '}
           <span className={theme === 'light' ? 'text-black/70' : 'text-white/60'}>
-            {config.label}
+            {label}
           </span>
         </p>
 
@@ -90,9 +110,11 @@ export function TikTokEventBubble({
                 ×{event.giftCount}
               </span>
             )}
-            {event.giftDiamonds != null && (
-              <span className="text-xs text-[#ffd700]/80">
-                💎 {event.giftDiamonds * (event.giftCount ?? 1)}
+            {event.giftValue != null && (
+              <span className="inline-flex items-center gap-0.5 text-xs text-[#ffd700]/80">
+                {event.platform === 'tiktok' && <Gem className="h-3 w-3" />}
+                {event.giftValue * count}
+                {event.platform === 'kick' && ' kicks'}
               </span>
             )}
           </div>

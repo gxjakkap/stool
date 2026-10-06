@@ -9,6 +9,9 @@ const CHANNEL_KEYS = [
   "youtube_channel_id",
   "youtube_api_key",
   "tiktok_username",
+  "kick_channel",
+  "kick_client_id",
+  "kick_client_secret",
 ];
 
 export const settingsRoutes = new Elysia({ prefix: "/api/settings" })
