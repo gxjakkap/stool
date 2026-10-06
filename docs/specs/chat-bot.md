@@ -62,7 +62,7 @@ Settings gets, per platform, "Connect bot account" and "Connect broadcaster acco
 
 - Routes: `GET /api/bot/oauth/:platform/:role/start` (session-protected) redirects to the provider. The provider returns to `GET /api/bot/oauth/:platform/callback` (one URI per platform; the role travels in the one-time `state`, which expires after 10 minutes). Kick uses PKCE. `POST /api/bot/oauth/:platform/:role/disconnect` clears an account.
 - Scopes:
-  - Twitch bot: `chat:read chat:edit`.
+  - Twitch bot: `chat:read chat:edit user:write:chat moderator:manage:chat_messages` (the last two are for the pinned message; a bot connected before them must reconnect).
   - Twitch broadcaster: `channel:manage:broadcast`.
   - Kick bot: `user:read chat:write`.
   - Kick broadcaster: `user:read channel:read channel:write`.
@@ -175,6 +175,14 @@ Any parse, runtime, timeout or fetch error: chat gets `@user command failed`, an
 - Messages are rendered through the macro engine with `user = ""`, `args = []`, `query = ""`.
 - Last-fired times and line counters are kept in memory; a restart resets them, which is acceptable.
 - Live status is cached from the uptime/title APIs and refreshed at most once a minute per platform.
+
+## Pinned message (`services/timers.ts`)
+
+- One template in the `pinned_message` setting, edited on the dashboard's Pinned tab. Empty disables it.
+- The timer tick posts it once per stream on each platform that is live and has a bot account. The stream's start time is stored in `pinned_message_<platform>_stream`, so a restart mid-stream does not repost. It is stored before sending, so a failure is logged and not retried until the next stream.
+- Rendered through the macro engine like timers.
+- Twitch: sent by the bot via Helix `POST /chat/messages` (IRC returns no message id), then pinned with `PUT /chat/pins` with no duration, which pins until the stream ends. The bot must be a moderator.
+- Kick: the public API has no pin endpoint, so the message is only sent.
 
 ## HTTP API
 

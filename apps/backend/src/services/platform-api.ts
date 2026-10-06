@@ -116,3 +116,21 @@ export async function sendKickChat(content: string): Promise<void> {
     })
   );
 }
+
+/** Sends as the bot via Helix (IRC gives no message id) and pins until the stream ends. Bot must be a moderator. */
+export async function pinTwitchChat(message: string): Promise<void> {
+  const bot = accountInfo("twitch", "bot");
+  if (!bot) throw new Error("bot account not connected");
+  const broadcaster = await twitchUserId(channelOf("twitch"));
+  const sent = (
+    await json(
+      await userFetch("twitch", "bot", `${HELIX}/chat/messages`, {
+        method: "POST",
+        body: JSON.stringify({ broadcaster_id: broadcaster, sender_id: bot.userId, message }),
+      })
+    )
+  ).data[0];
+  if (!sent?.is_sent) throw new Error(`message dropped: ${sent?.drop_reason?.message ?? "unknown"}`);
+  const q = new URLSearchParams({ broadcaster_id: broadcaster, moderator_id: bot.userId, message_id: sent.message_id });
+  await json(await userFetch("twitch", "bot", `${HELIX}/chat/pins?${q}`, { method: "PUT" }));
+}

@@ -7,7 +7,7 @@ export const PLATFORMS: Platform[] = ["twitch", "kick"];
 export const ROLES: Role[] = ["bot", "broadcaster"];
 
 const SCOPES: Record<Platform, Record<Role, string>> = {
-  twitch: { bot: "chat:read chat:edit", broadcaster: "channel:manage:broadcast" },
+  twitch: { bot: "chat:read chat:edit user:write:chat moderator:manage:chat_messages", broadcaster: "channel:manage:broadcast" },
   kick: { bot: "user:read chat:write", broadcaster: "user:read channel:read channel:write" },
 };
 
