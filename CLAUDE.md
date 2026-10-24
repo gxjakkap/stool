@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-**Package manager:** Bun (v1.3.9). Use `bun` for all installs and script runs — not npm/yarn.
+**Package manager:** Bun (v1.4.4). Use `bun` for all installs and script runs — not npm/yarn.
 
 ```bash
 # Install dependencies
